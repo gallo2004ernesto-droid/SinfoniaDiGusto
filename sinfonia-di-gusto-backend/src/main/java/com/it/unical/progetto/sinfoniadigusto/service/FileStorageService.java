@@ -1,6 +1,5 @@
 package com.it.unical.progetto.sinfoniadigusto.service;
 
-
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,7 +34,7 @@ public class FileStorageService {
             // Genera un nome univoco per evitare sovrascritture
             String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
             Path targetLocation = this.uploadPath.resolve(filename);
-            
+
             Files.copy(file.getInputStream(), targetLocation);
 
             // Restituisce il percorso relativo/URL pubblico del file

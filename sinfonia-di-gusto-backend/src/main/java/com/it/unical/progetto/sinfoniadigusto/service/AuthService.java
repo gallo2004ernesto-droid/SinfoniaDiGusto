@@ -1,12 +1,5 @@
 package com.it.unical.progetto.sinfoniadigusto.service;
 
-import com.it.unical.progetto.sinfoniadigusto.DTO.AuthDTOs.*;
-import com.it.unical.progetto.sinfoniadigusto.exception.BadRequestException;
-import com.it.unical.progetto.sinfoniadigusto.model.ClientUser;
-import com.it.unical.progetto.sinfoniadigusto.model.Role;
-import com.it.unical.progetto.sinfoniadigusto.repository.ClientUserRepository;
-import com.it.unical.progetto.sinfoniadigusto.util.JwtUtil;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,10 +7,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.it.unical.progetto.sinfoniadigusto.DTO.AuthDTOs.*;
+import com.it.unical.progetto.sinfoniadigusto.DTO.AuthDTOs.AuthResponse;
+import com.it.unical.progetto.sinfoniadigusto.DTO.AuthDTOs.LoginRequest;
+import com.it.unical.progetto.sinfoniadigusto.DTO.AuthDTOs.RegisterRequest;
+import com.it.unical.progetto.sinfoniadigusto.exception.BadRequestException;
+import com.it.unical.progetto.sinfoniadigusto.model.ClientUser;
+import com.it.unical.progetto.sinfoniadigusto.model.Role;
+import com.it.unical.progetto.sinfoniadigusto.repository.ClientUserRepository;
+import com.it.unical.progetto.sinfoniadigusto.util.JwtUtil;
+
 @Service
 public class AuthService {
 
-	@Autowired
+    @Autowired
     private ClientUserRepository userRepository;
 
     @Autowired
@@ -29,7 +32,6 @@ public class AuthService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {

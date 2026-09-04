@@ -25,7 +25,7 @@ import com.it.unical.progetto.sinfoniadigusto.repository.ProductRepository;
 @Service
 public class OrderService {
 
-    @Autowired 
+    @Autowired
     private OrderRepository orderRepository;
 
     @Autowired

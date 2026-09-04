@@ -23,15 +23,13 @@ public class ProductService {
 
     @Autowired
     private CategoryRepository categoryRepository;
-    
+
     @Autowired
     private FileStorageService fileStorageService;
-
 
     // =========================================================
     // GET ALL
     // =========================================================
-
     @Transactional(readOnly = true)
     public List<ProductResponse> getAllProducts() {
 
@@ -41,17 +39,15 @@ public class ProductService {
                 .toList();
     }
 
-
     // =========================================================
     // GET BY ID
     // =========================================================
-
     @Transactional(readOnly = true)
     public ProductResponse getProductById(Long id) {
 
         Product product = productRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
+                .orElseThrow(()
+                        -> new ResourceNotFoundException(
                                 "Prodotto non trovato con ID: " + id
                         )
                 );
@@ -59,11 +55,9 @@ public class ProductService {
         return mapToResponse(product);
     }
 
-
     // =========================================================
     // GET BY CATEGORY
     // =========================================================
-
     @Transactional(readOnly = true)
     public List<ProductResponse> getProductsByCategory(Long categoryId) {
 
@@ -73,11 +67,9 @@ public class ProductService {
                 .toList();
     }
 
-
     // =========================================================
     // SEARCH
     // =========================================================
-
     @Transactional(readOnly = true)
     public List<ProductResponse> searchProducts(String keyword) {
 
@@ -88,11 +80,9 @@ public class ProductService {
                 .toList();
     }
 
-
     // =========================================================
     // LOW STOCK
     // =========================================================
-
     @Transactional(readOnly = true)
     public List<ProductResponse> getLowStockProducts(Integer threshold) {
 
@@ -103,94 +93,91 @@ public class ProductService {
                 .toList();
     }
 
-
     // =========================================================
     // CREATE
     // =========================================================
-
     @Transactional
     public ProductResponse createProduct(ProductRequest request, MultipartFile imageFile, MultipartFile pdfFile) {
 
-    // Recupera la categoria tramite ID
-    Category category = categoryRepository
-            .findById(request.categoryId())
-            .orElseThrow(() ->
-                    new ResourceNotFoundException(
-                            "Categoria non trovata con ID: "
-                                    + request.categoryId()
-                    )
-            );
+        // Recupera la categoria tramite ID
+        Category category = categoryRepository
+                .findById(request.categoryId())
+                .orElseThrow(()
+                        -> new ResourceNotFoundException(
+                                "Categoria non trovata con ID: "
+                                + request.categoryId()
+                        )
+                );
 
-    Product product = new Product();
+        Product product = new Product();
 
-    product.setName(request.name());
-    product.setDescription(request.description());
-    product.setPrice(request.price());
+        product.setName(request.name());
+        product.setDescription(request.description());
+        product.setPrice(request.price());
 
-    // Il DB richiede stockQuantity NOT NULL
-    product.setStockQuantity(
-            request.stockQuantity() != null
-                    ? request.stockQuantity()
-                    : 0
-    );
+        // Il DB richiede stockQuantity NOT NULL
+        product.setStockQuantity(
+                request.stockQuantity() != null
+                ? request.stockQuantity()
+                : 0
+        );
 
-    // Gestione file Immagine
-    if (imageFile != null && !imageFile.isEmpty()) {
-        String savedImagePath = fileStorageService.storeFile(imageFile); // Salva il file e restituisce il path/url
-        product.setImageUrl(savedImagePath);
-    } else {
-        product.setImageUrl(request.imageUrl()); // Fallback se viene passato un URL stringa
+        // Gestione file Immagine
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String savedImagePath = fileStorageService.storeFile(imageFile); // Salva il file e restituisce il path/url
+            product.setImageUrl(savedImagePath);
+        } else {
+            product.setImageUrl(request.imageUrl()); // Fallback se viene passato un URL stringa
+        }
+
+        // Prezzo originale
+        product.setOriginalPrice(
+                request.originalPrice()
+        );
+
+        // Offerta
+        product.setIsOffer(
+                request.isOffer() != null
+                ? request.isOffer()
+                : false
+        );
+
+        // Percentuale sconto
+        product.setDiscountPercent(
+                request.discountPercent()
+        );
+
+        // Prodotto in evidenza
+        product.setFeatured(
+                request.featured() != null
+                ? request.featured()
+                : false
+        );
+
+        // Colore background
+        product.setBgColor(
+                request.bgColor()
+        );
+
+        // Gestione file PDF (Scheda Tecnica)
+        if (pdfFile != null && !pdfFile.isEmpty()) {
+            String savedPdfPath = fileStorageService.storeFile(pdfFile); // Salva il file PDF sul server
+            product.setPdfUrl(savedPdfPath);
+        } else {
+            product.setPdfUrl(request.pdfUrl()); // Fallback se viene passato un URL stringa
+        }
+
+        // Categoria
+        product.setCategory(category);
+
+        Product saved = productRepository.save(product);
+
+        return mapToResponse(saved);
     }
-
-    // Prezzo originale
-    product.setOriginalPrice(
-            request.originalPrice()
-    );
-
-    // Offerta
-    product.setIsOffer(
-            request.isOffer() != null
-                    ? request.isOffer()
-                    : false
-    );
-
-    // Percentuale sconto
-    product.setDiscountPercent(
-            request.discountPercent()
-    );
-
-    // Prodotto in evidenza
-    product.setFeatured(
-            request.featured() != null
-                    ? request.featured()
-                    : false
-    );
-
-    // Colore background
-    product.setBgColor(
-            request.bgColor()
-    );
-
-    // Gestione file PDF (Scheda Tecnica)
-    if (pdfFile != null && !pdfFile.isEmpty()) {
-        String savedPdfPath = fileStorageService.storeFile(pdfFile); // Salva il file PDF sul server
-        product.setPdfUrl(savedPdfPath);
-    } else {
-        product.setPdfUrl(request.pdfUrl()); // Fallback se viene passato un URL stringa
-    }
-
-    // Categoria
-    product.setCategory(category);
-
-    Product saved = productRepository.save(product);
-
-    return mapToResponse(saved);
-}
 
     // =========================================================
     // UPDATE
     // =========================================================
-
     @Transactional
     public ProductResponse updateProduct(
             Long id,
@@ -200,8 +187,8 @@ public class ProductService {
     ) {
 
         Product product = productRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
+                .orElseThrow(()
+                        -> new ResourceNotFoundException(
                                 "Prodotto non trovato con ID: " + id
                         )
                 );
@@ -209,34 +196,31 @@ public class ProductService {
         // =========================================================
         // CATEGORIA
         // =========================================================
-
         Category category = categoryRepository
                 .findById(request.categoryId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
+                .orElseThrow(()
+                        -> new ResourceNotFoundException(
                                 "Categoria non trovata con ID: "
-                                        + request.categoryId()
+                                + request.categoryId()
                         )
                 );
 
         // =========================================================
         // DATI PRINCIPALI
         // =========================================================
-
         product.setName(request.name());
         product.setDescription(request.description());
         product.setPrice(request.price());
 
         product.setStockQuantity(
                 request.stockQuantity() != null
-                        ? request.stockQuantity()
-                        : 0
+                ? request.stockQuantity()
+                : 0
         );
 
         // =========================================================
         // PREZZO ORIGINALE
         // =========================================================
-
         product.setOriginalPrice(
                 request.originalPrice()
         );
@@ -244,17 +228,15 @@ public class ProductService {
         // =========================================================
         // OFFERTA
         // =========================================================
-
         product.setIsOffer(
                 request.isOffer() != null
-                        ? request.isOffer()
-                        : false
+                ? request.isOffer()
+                : false
         );
 
         // =========================================================
         // SCONTO
         // =========================================================
-
         product.setDiscountPercent(
                 request.discountPercent()
         );
@@ -262,17 +244,15 @@ public class ProductService {
         // =========================================================
         // FEATURED
         // =========================================================
-
         product.setFeatured(
                 request.featured() != null
-                        ? request.featured()
-                        : false
+                ? request.featured()
+                : false
         );
 
         // =========================================================
         // BACKGROUND COLOR
         // =========================================================
-
         product.setBgColor(
                 request.bgColor()
         );
@@ -280,11 +260,10 @@ public class ProductService {
         // =========================================================
         // IMMAGINE
         // =========================================================
-
         if (imageFile != null && !imageFile.isEmpty()) {
 
-            String savedImagePath =
-                    fileStorageService.storeFile(imageFile);
+            String savedImagePath
+                    = fileStorageService.storeFile(imageFile);
 
             product.setImageUrl(savedImagePath);
         }
@@ -292,11 +271,10 @@ public class ProductService {
         // =========================================================
         // PDF
         // =========================================================
-
         if (pdfFile != null && !pdfFile.isEmpty()) {
 
-            String savedPdfPath =
-                    fileStorageService.storeFile(pdfFile);
+            String savedPdfPath
+                    = fileStorageService.storeFile(pdfFile);
 
             product.setPdfUrl(savedPdfPath);
         }
@@ -304,24 +282,19 @@ public class ProductService {
         // =========================================================
         // CATEGORIA
         // =========================================================
-
         product.setCategory(category);
 
         // =========================================================
         // SALVATAGGIO
         // =========================================================
-
         Product updated = productRepository.save(product);
 
         return mapToResponse(updated);
     }
 
-
-
     // =========================================================
     // DELETE
     // =========================================================
-
     @Transactional
     public void deleteProduct(Long id) {
 
@@ -335,43 +308,26 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-
     // =========================================================
     // MAPPING ENTITY -> RESPONSE
     // =========================================================
-
     private ProductResponse mapToResponse(Product product) {
 
         return new ProductResponse(
-
                 product.getId(),
-
                 product.getName(),
-
                 product.getDescription(),
-
                 product.getPrice(),
-
                 product.getOriginalPrice(),
-
                 product.getStockQuantity(),
-
                 product.getIsOffer(),
-
                 product.getDiscountPercent(),
-
                 product.getFeatured(),
-
                 product.getImageUrl(),
-
                 product.getBgColor(),
-
                 product.getPdfUrl(),
-
                 product.getCategory().getId(),
-
                 product.getCategory().getName()
         );
     }
 }
-

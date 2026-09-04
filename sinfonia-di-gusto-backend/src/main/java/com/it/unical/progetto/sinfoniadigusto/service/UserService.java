@@ -13,10 +13,11 @@ import com.it.unical.progetto.sinfoniadigusto.repository.ClientUserRepository;
 
 @Service
 public class UserService {
-	@Autowired
-	private ClientUserRepository userRepository;
-	
-	public UserProfileResponse getUserProfile(String email) {
+
+    @Autowired
+    private ClientUserRepository userRepository;
+
+    public UserProfileResponse getUserProfile(String email) {
         ClientUser user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Utente non trovato con email: " + email));
 
@@ -28,7 +29,7 @@ public class UserService {
                 .map(this::mapToProfile)
                 .toList();
     }
-    
+
     @Transactional
     public void deleteUser(Long userId) {
         if (!userRepository.existsById(userId)) {
