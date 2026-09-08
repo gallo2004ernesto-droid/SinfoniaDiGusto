@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+/* Variabili Colore Globali */
+:root {
+  --primary-brown: #5c3d2e;    /* Marrone cioccolato fondente tenue per i testi principali */
+  --secondary-brown: #966f57;  /* Tonalità biscotto dorato per gli stati hover e dettagli */
+  --cream-bg: #fffbf7;         /* Sfondo panna/crema calda molto luminoso */
+  --announcement-bg: #f7ede2;  /* Tonalità crema pasticcera delicata per la barra annunci */
+  --accent-pink: #f08080;      /* Rosa lampone / fragola per bottoni del carrello e badge */
+  --text-muted: #8d7b71;       /* Nocciola chiaro tenue per i testi secondari */
+}
+
+
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+
