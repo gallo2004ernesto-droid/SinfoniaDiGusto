@@ -1,0 +1,412 @@
+<app-admin-header></app-admin-header>
+
+<div class="products-container">
+
+  <div class="header-actions">
+    <div>
+      <h2>Gestione Prodotti</h2>
+      <p>Gestisci catalogo, prezzi, offerte e schede tecniche PDF</p>
+    </div>
+
+    <button class="btn-create" (click)="openCreateModal()">
+      Nuovo Prodotto
+    </button>
+  </div>
+
+  <!-- BARRA FILTRI E RICERCA -->
+  <div class="filter-card">
+
+    <div class="filter-group search-box">
+      <label for="search">Cerca Prodotto</label>
+
+      <input id="search" type="text" placeholder="Nome o descrizione..." [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)" />
+    </div>
+
+    <div class="filter-group">
+      <label for="categoryFilter">Categoria</label>
+
+      <select id="categoryFilter" [ngModel]="selectedCategory()" (ngModelChange)="selectedCategory.set($event)">
+        <option value="">Tutte le categorie</option>
+
+        @for (cat of categories(); track cat.id) {
+        <option [value]="cat.id">
+          {{ cat.name }}
+        </option>
+        }
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="statusFilter">Stato Prodotto</label>
+
+      <select id="statusFilter" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+        <option value="ALL">Tutti i prodotti</option>
+        <option value="SALE">In Offerta</option>
+        <option value="FEATURED">In Evidenza</option>
+      </select>
+    </div>
+
+    <div class="filter-group btn-reset-wrapper">
+      <button class="btn-reset" type="button" (click)="resetFilters()">
+        Reset Filtri
+      </button>
+    </div>
+
+  </div>
+
+  <!-- CARICAMENTO -->
+  @if (isLoading()) {
+
+  <div class="state-message">
+    Caricamento prodotti...
+  </div>
+
+  } @else {
+
+  <!-- TABELLA PRODOTTI -->
+  <div class="table-responsive">
+
+    <table class="data-table">
+
+      <thead>
+        <tr>
+          <th>Anteprima</th>
+          <th>Prodotto</th>
+          <th>Categoria</th>
+          <th>Prezzo</th>
+          <th>Promo / Sconto</th>
+          <th>Stock</th>
+          <th>Azioni</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        @for (product of filteredProducts(); track product.id) {
+
+        <tr>
+
+          <!-- ANTEPRIMA -->
+          <td data-label="Anteprima">
+
+            <div class="thumb-wrapper" [style.backgroundColor]="
+                    product.bgColor || '#f1f5f9'
+                  ">
+
+              <img [src]="getImageUrl(product.imageUrl)" [alt]="product.name" class="product-thumb" />
+
+            </div>
+
+          </td>
+
+          <!-- PRODOTTO -->
+          <td data-label="Prodotto">
+
+            <div class="product-info">
+
+              <strong>
+                {{ product.name }}
+
+                @if (product.featured) {
+                <span class="badge-featured">
+                  In Evidenza
+                </span>
+                }
+
+              </strong>
+
+              <small class="text-muted">
+                {{ product.description }}
+              </small>
+
+            </div>
+
+          </td>
+
+          <!-- CATEGORIA -->
+          <td data-label="Categoria">
+            {{ product.category }}
+          </td>
+
+          <!-- PREZZO -->
+          <td data-label="Prezzo">
+
+            <div class="price-box">
+
+              <strong>
+                € {{ product.price.toFixed(2) }}
+              </strong>
+
+              @if (product.originalPrice) {
+
+              <del class="old-price">
+                € {{ product.originalPrice.toFixed(2) }}
+              </del>
+
+              }
+
+            </div>
+
+          </td>
+
+          <!-- PROMO -->
+          <td data-label="Promo / Sconto">
+
+            @if (product.isOffer) {
+
+            <span class="badge-sale">
+              -{{ product.discountPercent || 0 }}% IN OFFERTA
+            </span>
+
+            } @else {
+
+            <span class="text-muted">
+              Standard
+            </span>
+
+            }
+
+          </td>
+
+          <td data-label="Stock">
+            <span [class.text-danger]="product.stockQuantity === 0">
+              {{ product.stockQuantity ?? 0 }} pz
+            </span>
+          </td>
+
+          <!-- AZIONI -->
+          <td data-label="Azioni" class="action-buttons">
+
+            <button class="btn-edit" type="button" (click)="openEditModal(product)">
+              Modifica
+            </button>
+
+            <button class="btn-delete" type="button" (click)="deleteProduct(product.id!)">
+              Elimina
+            </button>
+
+          </td>
+
+        </tr>
+
+        } @empty {
+
+        <tr>
+
+          <td colspan="6" class="empty-cell">
+            Nessun prodotto corrisponde ai filtri selezionati.
+          </td>
+
+        </tr>
+
+        }
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+  }
+
+  <!-- MODALE CREAZIONE / MODIFICA -->
+  @if (showModal) {
+
+  <div class="modal-backdrop" (click)="closeModal()">
+
+    <div class="modal-card" (click)="$event.stopPropagation()">
+
+      <h3>
+        {{
+        editingProduct
+        ? 'Modifica Prodotto'
+        : 'Nuovo Prodotto'
+        }}
+      </h3>
+
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+
+        <!-- NOME -->
+        <div class="form-group">
+
+          <label for="name">
+            Nome Prodotto *
+          </label>
+
+          <input id="name" type="text" formControlName="name" placeholder="Es. Panettone Artigianale" />
+
+        </div>
+
+        <!-- CATEGORIA / COLORE -->
+        <div class="form-row">
+
+          <div class="form-group">
+
+            <label for="category">
+              Categoria *
+            </label>
+
+            <select id="categoryId" formControlName="categoryId">
+
+              <option value="" disabled>
+                Seleziona Categoria
+              </option>
+
+              @for (cat of categories(); track cat.id) {
+
+              <option [value]="cat.id">
+                {{ cat.name }}
+              </option>
+
+              }
+
+            </select>
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="bgColor">
+              Colore Sfondo Card
+            </label>
+
+            <div class="color-picker-wrapper">
+
+              <input id="bgColor" type="color" formControlName="bgColor" />
+
+              <span class="color-hex">
+                {{ productForm.controls.bgColor.value }}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- PREZZI -->
+        <div class="form-row grid-3">
+
+          <div class="form-group">
+
+            <label for="price">
+              Prezzo (€) *
+            </label>
+
+            <input id="price" type="number" step="0.01" formControlName="price" placeholder="0.00" />
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="originalPrice">
+              Prezzo Orig. (€)
+            </label>
+
+            <input id="originalPrice" type="number" step="0.01" formControlName="originalPrice" placeholder="0.00" />
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="discountPercent">
+              Sconto (%)
+            </label>
+
+            <input id="discountPercent" type="number" formControlName="discountPercent" placeholder="Es. 20" />
+
+          </div>
+
+        </div>
+        <div class="form-group">
+          <div class="form-group">
+            <label for="stockQuantity">Quantità Stock *</label>
+            <input id="stockQuantity" type="number" min="0" formControlName="stockQuantity" placeholder="0" />
+          </div>
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="imageUrl">
+            Immagine file *
+          </label>
+          <input id="imageUrl" type="file" accept="image/*" (change)="onImageSelected($event)" />
+
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="pdfUrl">
+            URL Scheda Tecnica (PDF)
+          </label>
+
+          <input id="pdfFile" type="file" accept="application/pdf" (change)="onPdfSelected($event)" />
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="description">
+            Descrizione *
+          </label>
+
+          <textarea id="description" formControlName="description" rows="3"
+            placeholder="Descrizione del prodotto..."></textarea>
+
+        </div>
+
+        <div class="checkbox-row">
+
+          <label class="checkbox-label">
+
+            <input type="checkbox" formControlName="isOffer" />
+
+            In Offerta
+
+          </label>
+
+          <label class="checkbox-label">
+
+            <input type="checkbox" formControlName="featured" />
+
+            In Evidenza
+
+          </label>
+
+        </div>
+
+        <div class="modal-actions">
+
+          <button type="button" class="btn-cancel" (click)="closeModal()">
+            Annulla
+          </button>
+
+          <button type="submit" class="btn-save" [disabled]="
+                productForm.invalid ||
+                isSaving()
+              ">
+
+            {{
+            isSaving()
+            ? 'Salvataggio...'
+            : 'Salva Prodotto'
+            }}
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  }
+
+</div>

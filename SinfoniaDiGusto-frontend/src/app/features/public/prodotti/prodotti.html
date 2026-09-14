@@ -1,0 +1,77 @@
+<app-header
+  (toggleCartEvent)="openCart()">
+</app-header>
+
+<main class="catalog-container">
+  <header class="catalog-header">
+    <!-- <h1 class="catalog-title">{{ currentCategory().name }}</h1> -->
+     <h1 class="catalog-title">
+      {{ productState.onlyPromotions() ? 'Offerte Speciali' : 'Il Nostro Catalogo' }}
+    </h1>
+    <p class="catalog-subtitle">
+      {{ productState.onlyPromotions() ? 'I nostri dolci artigianali in promozione' : 'Tutte le nostre creazioni preparate ogni giorno' }}
+    </p>
+    <p class="catalog-subtitle">
+      @if (currentCategory().name) {
+        Esplora le nostre creazioni artigianali per la categoria {{ currentCategory().name }}
+      } @else {
+        Scopri la selezione completa dei nostri dolci preparati ogni giorno
+      }
+    </p>
+
+    <!-- Filtri dinamici caricati dal Database -->
+    <nav class="category-filters">
+      <a 
+        /* routerLink="/prodotti" */
+         [routerLink]="isOffer
+      ? ['/prodotti/offerte']
+      : ['/prodotti']"
+        class="filter-btn"
+        [class.active]="!productState.selectedCategory()">
+        Tutti i Prodotti
+      </a>
+
+      @for (cat of categoryState.categories(); track cat.id) {
+        <a 
+          [routerLink]="isOffer
+      ? ['/prodotti', 'offerte', cat.name.toLowerCase()]
+      : ['/prodotti', cat.name.toLowerCase()]"
+          class="filter-btn"
+          [class.active]="productState.selectedCategory() === cat.name.toLowerCase()">
+          {{ cat.name }}
+        </a>
+      }
+    </nav>
+  </header>
+
+  <!-- Griglia Prodotti -->
+  <section class="products-section">
+    @if (productState.isLoading()) {
+      <div class="loading-state">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <span>Caricamento prodotti in corso...</span>
+      </div>
+    } @else if (productState.products().length === 0) {
+      <div class="empty-state">
+        <i class="fa-solid fa-cookie-bite"></i>
+        <p>Nessun dolce trovato per la categoria {{ currentCategory().name }}.</p>
+        <a routerLink="/categorie" class="reset-link">Mostra tutti i prodotti</a>
+      </div>
+    } @else {
+      <div class="products-grid">
+        @for (product of productState.products(); track product.id) {
+          <app-product-card [product]="product"></app-product-card>
+        }
+      </div>
+    }
+  </section>
+</main>
+
+<app-footer></app-footer>
+
+<app-cart
+  [isOpen]="cartOpen"
+  (closeCart)="closeCart()">
+</app-cart>
+
+<!-- <app-cart-drawer></app-cart-drawer> -->

@@ -1,0 +1,38 @@
+<div class="product-card">
+    <!-- Badge Offerta o In Evidenza -->
+    @if (product().isOffer && product().discountPercent) {
+        <span class="badge-sale">-{{ product().discountPercent }}%</span>
+    } @else if (product().featured && product().isOffer && product().discountPercent) {
+        <span class="badge-featured">In Evidenza</span>
+        <span class="badge-sale">-{{ product().discountPercent }}%</span>
+    } @else if (product().featured) {
+        <span class="badge-featured">In Evidenza</span>
+    }
+
+    <div class="card-img-wrapper" [routerLink]="['/prodotti', (product().categoryName || 'all').toLowerCase(), product().id]">
+        <img [src]="getImageUrl(product().imageUrl)" [alt]="product().name">
+    </div>
+
+    <div class="card-content">
+        <span class="category-tag">{{ product().categoryName }}</span>
+        <h3 class="product-title" [routerLink]="['/prodotti', (product().categoryName || 'all').toLowerCase(), product().id]">
+            {{ product().name }}
+        </h3>
+        <p class="product-description">{{ product().description }}</p>
+    </div>
+
+    <div class="price-row">
+        <div class="price-container">
+            @if (product().isOffer && product().originalPrice) {
+                <span class="original-price">{{ product().originalPrice | currency:'EUR':'symbol':'1.2-2' }}</span>
+                <span class="price sale-price">{{ product().price | currency:'EUR':'symbol':'1.2-2' }}</span>
+            } @else {
+                <span class="price">{{ product().price | currency:'EUR':'symbol':'1.2-2' }}</span>
+            }
+        </div>
+        <button class="pdf-btn" (click)="onAddToCart()">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span>Aggiungi al Carrello</span>
+        </button>
+    </div>
+</div>

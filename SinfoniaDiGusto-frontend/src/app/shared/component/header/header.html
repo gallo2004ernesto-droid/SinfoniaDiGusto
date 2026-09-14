@@ -1,0 +1,86 @@
+<div class="announcement-bar">
+    <span>🍪 Scopri le nostre delizie artigianali — Ordina ora</span>
+</div>
+
+<header class="main-header">
+    <div class="header-container">
+        <button class="icon-btn" aria-label="Apri menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <button class="icon-btn" aria-label="Cerca">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+    </div>
+
+    <!-- LOGO  -->
+    <div class="brand-logo" routerLink="/">
+        <h1 class="logo">
+            <span class="start-end">Sinfonia </span><span class="center"> Di </span><span class="start-end">Gusto</span>
+        </h1>
+    </div>
+
+    <!-- Account e Carrello -->
+    <div class="header-actions right">
+        <a [routerLink]="['/auth','login']" class="icon-btn" aria-label="Account">
+            <i class="fa-regular fa-user"></i>
+        </a>
+        <button class="icon-btn cart-btn" (click) = "onOpenCart()" aria-label="Apri Carrello">
+            <i class="fa-solid fa-bag-shopping"></i>
+            @if(cartCount() > 0){
+                <span class="cart-badge">{{ cartCount() }}</span>
+            }
+        </button>
+    </div>
+</header>
+
+<!-- main menu -->
+
+<nav class="main-nav">
+  <ul class="nav-links">
+    <li>
+      <a routerLink="/" routerLinkActive="active"
+         [routerLinkActiveOptions]="{exact: true}">
+        Home
+      </a>
+    </li>
+
+    <li class="dropdown">
+      <a routerLink="/prodotti">Prodotti</a>
+      <ul class="dropdown-menu">
+        @for (cat of categories(); track cat.id) {
+          <li>
+            <a [routerLink]="['/prodotti',cat.name.toLowerCase()]">
+              {{ cat.name}}
+            </a>
+          </li>
+        } @empty {
+          <li><a routerLink="/prodotti">Tutti i prodotti</a></li>
+        }
+        <!-- <li><a routerLink="/prodotti/torte">Torte</a></li>
+        <li><a routerLink="/prodotti/biscotti">Biscotti</a></li>
+        <li><a routerLink="/prodotti/crostate" >Crostate</a></li>
+        <li><a routerLink="/prodotti/cornetti" >Cornetti</a></li>
+        <li><a routerLink="/prodotti/dessert" >Dessert</a></li> -->
+      </ul>
+    </li>
+
+    <li class="dropdown">
+      <a href="#">Servizi clienti</a>
+      <ul class="dropdown-menu">
+        <li><a routerLink="/contatti">Contatti</a></li>
+        <li><a routerLink="/faq">FAQ</a></li>
+        <li><a routerLink="/spedizioni-consegne">Spedizioni e consegne</a></li>
+        <li><a routerLink="/pagamenti">Pagamenti</a></li>
+      </ul>
+    </li>
+
+    <li>
+      <a routerLink="/chi-siamo">Chi siamo</a>
+    </li>
+
+    <li>
+        <a [routerLink]="['/prodotti/offerte']"> Promozioni</a>
+    </li>
+  </ul>
+</nav>
+

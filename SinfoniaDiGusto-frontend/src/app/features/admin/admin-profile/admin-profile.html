@@ -1,0 +1,83 @@
+<app-admin-header></app-admin-header>
+
+<div class="profile-container">
+  <div class="header-section">
+    <h2>Il Mio Profilo</h2>
+    <p>Gestisci le tue informazioni personali e le credenziali di accesso</p>
+  </div>
+
+  <div class="profile-grid">
+    <!-- SEZIONE DATI PERSONALI -->
+    <div class="card">
+      <h3>Informazioni Utente</h3>
+      
+      @if (profileMessage()) {
+        <div class="alert" [class.success]="profileMessage()?.type === 'success'" [class.error]="profileMessage()?.type === 'error'">
+          {{ profileMessage()?.text }}
+        </div>
+      }
+
+      <form [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()">
+        <div class="form-group">
+          <label for="name">Nome Completo</label>
+          <input id="name" type="text" formControlName="name" placeholder="Es. Mario Rossi" />
+          @if (profileForm.controls.name.touched && profileForm.controls.name.errors?.['required']) {
+            <small class="error-text">Il nome è obbligatorio.</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Principale</label>
+          <input id="email" type="email" formControlName="email" placeholder="admin@sinfoniadigusto.it" />
+          @if (profileForm.controls.email.touched && profileForm.controls.email.errors?.['email']) {
+            <small class="error-text">Inserisci una mail valida.</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="role">Ruolo Sistema</label>
+          <input id="role" type="text" formControlName="role" class="input-disabled" />
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="profileForm.invalid || isUpdatingProfile()">
+          {{ isUpdatingProfile() ? 'Salvataggio...' : 'Salva Modifiche' }}
+        </button>
+      </form>
+    </div>
+
+    <!-- SEZIONE CAMBIO PASSWORD -->
+    <div class="card">
+      <h3>Sicurezza e Password</h3>
+
+      @if (passwordMessage()) {
+        <div class="alert" [class.success]="passwordMessage()?.type === 'success'" [class.error]="passwordMessage()?.type === 'error'">
+          {{ passwordMessage()?.text }}
+        </div>
+      }
+
+      <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()">
+        <div class="form-group">
+          <label for="currentPassword">Password Attuale</label>
+          <input id="currentPassword" type="password" formControlName="currentPassword" placeholder="••••••••" />
+        </div>
+
+        <div class="form-group">
+          <label for="newPassword">Nuova Password</label>
+          <input id="newPassword" type="password" formControlName="newPassword" placeholder="Almeno 6 caratteri" />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Conferma Nuova Password</label>
+          <input id="confirmPassword" type="password" formControlName="confirmPassword" placeholder="Ripeti la password" />
+          @if (passwordForm.errors?.['passwordMismatch'] && passwordForm.controls.confirmPassword.touched) {
+            <small class="error-text">Le password non coincidono.</small>
+          }
+        </div>
+
+        <button type="submit" class="btn-secondary" [disabled]="passwordForm.invalid || isChangingPassword()">
+          {{ isChangingPassword() ? 'Aggiornamento...' : 'Modifica Password' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

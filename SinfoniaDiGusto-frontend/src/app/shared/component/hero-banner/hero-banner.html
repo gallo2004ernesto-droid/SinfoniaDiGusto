@@ -1,0 +1,15 @@
+<section class="hero-container">
+    <div class="hero-bg-blur" [style.background-image] = "'url('+ bgImageUrl() + ')'"></div>
+
+    <div class="hero-overlay"></div>
+
+    <div class="hero-card">
+        <span class="hero-subtitle">{{ subtitle() }}</span>
+        <h2>{{ title() }}</h2>
+        <p>{{ description() }}</p>
+
+        <a [routerLink]="buttonLink()" class="hero-btn">
+            {{buttonText()}}
+        </a>
+    </div>
+</section>

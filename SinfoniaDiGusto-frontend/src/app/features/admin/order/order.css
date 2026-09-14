@@ -1,0 +1,197 @@
+.orders-container {
+  max-width: 1100px;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+}
+
+.header-section {
+  margin-bottom: 1.5rem;
+}
+
+.header-section h2 {
+  color: #0f172a;
+  margin-bottom: 0.25rem;
+}
+
+.header-section p {
+  color: #64748b;
+  margin: 0;
+}
+
+.table-responsive {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: left;
+}
+
+.data-table th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.customer-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.text-muted {
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+/* Badge dinamici per le Select di Stato */
+.status-select {
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+}
+
+.status-select.pending { background-color: #fef3c7; color: #d97706; }
+.status-select.processing { background-color: #e0f2fe; color: #0284c7; }
+.status-select.shipped { background-color: #f3e8ff; color: #9333ea; }
+.status-select.delivered { background-color: #dcfce7; color: #15803d; }
+.status-select.cancelled { background-color: #fee2e2; color: #b91c1c; }
+
+.btn-details {
+  background-color: #0f172a;
+  color: white;
+  border: none;
+  padding: 0.45rem 0.85rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.empty-cell, .state-message {
+  text-align: center;
+  color: #64748b;
+  padding: 2rem;
+}
+
+/* Modal Responsive */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+  padding: 1rem;
+}
+
+.modal-card {
+  background: white;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.info-group p {
+  margin: 0.4rem 0;
+  color: #334155;
+}
+
+.items-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 2px solid #0f172a;
+}
+
+/* Tabella Responsive a Card per Mobile (< 768px) */
+@media (max-width: 767px) {
+  .data-table, .data-table tbody, .data-table tr, .data-table td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .data-table thead {
+    display: none;
+  }
+
+  .data-table tr {
+    margin-bottom: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .data-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .data-table td:last-child {
+    border-bottom: none;
+    margin-top: 0.5rem;
+  }
+
+  .data-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #64748b;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+  }
+}

@@ -1,0 +1,113 @@
+<app-header (toggleCartEvent)="openCart()"></app-header>
+
+<main class="detail-container">
+  @if (isLoading()) {
+    <div class="loading-state">
+      <i class="fa-solid fa-circle-notch fa-spin"></i>
+      <p>Caricamento dettaglio prodotto...</p>
+    </div>
+  } @else if (!product()) {
+    <div class="empty-state">
+      <i class="fa-solid fa-cookie-bite"></i>
+      <h2>Prodotto non trovato</h2>
+      <p>Il dolce che stai cercando non è disponibile o è stato rimosso.</p>
+      <a routerLink="/prodotti" class="back-btn">Torna al Catalogo</a>
+    </div>
+  } @else {
+    <!-- Breadcrumb Navigazione Dinamica -->
+    <nav class="breadcrumb">
+      <a routerLink="/prodotti">Catalogo</a>
+      
+      @if (isOffertRoute()) {
+        <i class="fa-solid fa-chevron-right"></i>
+        <a routerLink="/prodotti/offerta">Offerte</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <a [routerLink]="['/prodotti/offerta', (product()?.categoryName || product()?.category)?.toLowerCase()]">
+          {{ product()?.categoryName || product()?.category }}
+        </a>
+      } @else {
+        <i class="fa-solid fa-chevron-right"></i>
+        <a [routerLink]="['/prodotti', (product()?.categoryName || product()?.category)?.toLowerCase()]">
+          {{ product()?.categoryName || product()?.category }}
+        </a>
+      }
+
+      <i class="fa-solid fa-chevron-right"></i>
+      <span>{{ product()?.name }}</span>
+    </nav>
+
+    <div class="product-detail-layout">
+      <!-- Immagine Prodotto e Badge -->
+      <div class="image-column">
+        <div class="badges-container">
+          @if (product()?.featured) {
+            <span class="badge-featured">In Evidenza</span>
+          }
+          @if (product()?.isOffer && product()?.discountPercent) {
+            <span class="badge-sale">-{{ product()?.discountPercent }}%</span>
+          }
+        </div>
+        
+        <!-- GET Immagine tramite funzione getImageUrl -->
+        <img [src]="getImageUrl(product()?.imageUrl)" [alt]="product()?.name" class="main-image">
+      </div>
+
+      <!-- Info e Azioni -->
+      <div class="info-column">
+        <span class="category-tag">{{ product()?.categoryName || product()?.category }}</span>
+        <h1 class="product-title">{{ product()?.name }}</h1>
+
+        <!-- Prezzi con Sconto o Standard -->
+        <div class="price-container">
+          @if (product()?.isOffer && product()?.originalPrice) {
+            <span class="original-price">{{ product()?.originalPrice | currency:'EUR':'symbol':'1.2-2' }}</span>
+            <span class="price sale-price">{{ product()?.price | currency:'EUR':'symbol':'1.2-2' }}</span>
+          } @else {
+            <span class="price">{{ product()?.price | currency:'EUR':'symbol':'1.2-2' }}</span>
+          }
+        </div>
+
+        <p class="description">{{ product()?.description }}</p>
+
+        <!-- Selettore Quantità e Pulsante Aggiungi al Carrello -->
+        <div class="actions-row">
+          <div class="quantity-selector">
+            <button (click)="decrementQuantity()" [disabled]="quantity() <= 1" aria-label="Riduci quantità">-</button>
+            <span>{{ quantity() }}</span>
+            <button (click)="incrementQuantity()" aria-label="Aumenta quantità">+</button>
+          </div>
+
+          <button class="add-to-cart-btn" (click)="addToCart()">
+            <i class="fa-solid fa-bag-shopping"></i>
+            Aggiungi al Carrello
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Blocco Scheda Tecnica PDF -->
+    @if (product()?.pdfUrl) {
+      <div class="technical-sheet-box">
+        <div class="sheet-info">
+          <i class="fa-solid fa-file-pdf pdf-icon"></i>
+          <div>
+            <strong>Scheda Tecnica & Allergeni</strong>
+            <p>Scarica il PDF allegato con ingredienti e allergeni.</p>
+          </div>
+        </div>
+        
+        <!-- Chiamata al metodo openPdf() del componente -->
+        <button type="button" (click)="openPdf()" class="download-pdf-btn">
+          <i class="fa-solid fa-download"></i> Scarica PDF
+        </button>
+      </div>
+    }
+  }
+</main>
+
+<app-footer></app-footer>
+
+<app-cart
+  [isOpen]="cartOpen"
+  (closeCart)="closeCart()">
+</app-cart>

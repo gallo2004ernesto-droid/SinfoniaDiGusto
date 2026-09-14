@@ -1,0 +1,49 @@
+<div class="login-container">
+  <h2>Accedi a Sinfonia Di Gusto</h2>
+
+  @if (errorMessage) {
+    <div class="error-alert">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input 
+        id="email" 
+        type="email" 
+        formControlName="email" 
+        placeholder="mario.rossi@example.com"
+      />
+      @if (loginForm.controls.email.touched) {
+        @if (loginForm.controls.email.errors?.['required']) {
+          <small class="error-text">L'email è obbligatoria.</small>
+        } @else if (loginForm.controls.email.errors?.['email']) {
+          <small class="error-text">Inserisci un indirizzo email valido.</small>
+        }
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input 
+        id="password" 
+        type="password" 
+        formControlName="password" 
+        placeholder="Inserisci la password"
+      />
+      @if (loginForm.controls.password.touched && loginForm.controls.password.errors?.['required']) {
+        <small class="error-text">La password è obbligatoria.</small>
+      }
+    </div>
+
+    <button type="submit" [disabled]="loginForm.invalid || isLoading">
+      {{ isLoading ? 'Accesso in corso...' : 'Accedi' }}
+    </button>
+  </form>
+
+  <p class="register-link">
+    Non hai un account? <a [routerLink]="['\auth','registrazione']">Registrati qui</a>
+  </p>
+</div>

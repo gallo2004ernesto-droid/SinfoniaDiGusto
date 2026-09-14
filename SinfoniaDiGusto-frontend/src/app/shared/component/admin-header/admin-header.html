@@ -1,0 +1,102 @@
+<header class="admin-header">
+  <div class="header-container">
+
+    <div class="brand">
+      <span class="badge-admin">
+        <i class="fa-solid fa-shield-halved"></i>
+        ADMIN
+      </span>
+
+      <a routerLink="/admin" class="brand-title">
+        Sinfonia Di Gusto
+      </a>
+    </div>
+
+    <button
+      class="hamburger"
+      (click)="toggleMenu()"
+      aria-label="Apri menu">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <nav class="admin-nav" [class.open]="isMenuOpen">
+
+      <a
+        [routerLink]="['/admin']"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeMenu()">
+
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <a
+        [routerLink]="['/admin', 'prodotti']"
+        routerLinkActive="active"
+        (click)="closeMenu()">
+
+        <i class="fa-solid fa-cake-candles"></i>
+        <span>Prodotti</span>
+      </a>
+
+      <a
+        [routerLink]="['/admin', 'categorie']"
+        routerLinkActive="active"
+        (click)="closeMenu()">
+
+        <i class="fa-solid fa-tags"></i>
+        <span>Categorie</span>
+      </a>
+
+      <a
+        [routerLink]="['/admin', 'ordini']"
+        routerLinkActive="active"
+        (click)="closeMenu()">
+
+        <i class="fa-solid fa-box-open"></i>
+        <span>Ordini</span>
+      </a>
+
+      <a
+        [routerLink]="['/admin', 'clienti']"
+        routerLinkActive="active"
+        (click)="closeMenu()">
+
+        <i class="fa-solid fa-users"></i>
+        <span>Clienti</span>
+      </a>
+
+      <div class="nav-right">
+
+        <a
+          [routerLink]="['/admin', 'il-mio-profilo']"
+          class="profile-link"
+          (click)="closeMenu()">
+
+          <i class="fa-solid fa-user-circle"></i>
+          <span>{{ authService.currentUser()?.firstName }}</span>
+        </a>
+
+        <a
+          routerLink="/"
+          class="btn-store"
+          (click)="closeMenu()">
+
+          <i class="fa-solid fa-store"></i>
+          <span>Torna al Negozio</span>
+        </a>
+
+        <button
+          class="btn-logout"
+          (click)="authService.logout()">
+
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </button>
+
+      </div>
+
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,79 @@
+<app-header></app-header>
+
+<main class="my-orders-container">
+  <h1>I Miei Ordini</h1>
+
+  @if (isLoading()) {
+    <div class="loading-spinner">Caricamento ordini in corso...</div>
+  } @else if (error()) {
+    <div class="error-message">{{ error() }}</div>
+  } @else if (orders().length === 0) {
+    <div class="empty-orders">
+      <p>Non hai ancora effettuato alcun ordine.</p>
+      <a routerLink="/prodotti" class="btn-primary">Inizia lo Shopping</a>
+    </div>
+  } @else {
+    <div class="orders-list">
+      @for (order of orders(); track order.id) {
+        <div class="order-card">
+          <!-- Header dell'ordine con evento click -->
+          <div class="order-header" (click)="toggleOrderDetails(order.id)">
+            <div class="order-info">
+              <span class="order-id">Ordine #{{ order.id }}</span>
+              <span class="order-date">{{ order.orderDate | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+
+            <div class="order-status-total">
+              <span class="status-badge" [ngClass]="order.status.toLowerCase()">
+                {{ getStatusLabel(order.status) }}
+              </span>
+              <span class="order-total">{{ order.totalAmount | currency:'EUR':'symbol':'1.2-2' }}</span>
+              <i class="fa-solid" [ngClass]="expandedOrderId() === order.id ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </div>
+          </div>
+
+          <!-- Dettagli espandibili dell'ordine -->
+          @if (expandedOrderId() === order.id) {
+            <div class="order-details">
+              <h4>Articoli Acquistati</h4>
+              <ul class="order-items-list">
+                @for (item of order.items; track item.id) {
+                  <li class="order-item">
+                    <div class="item-info">
+                      <strong>{{ item.productName }}</strong>
+                      <span class="item-qty">Qtà: {{ item.quantity }}</span>
+                    </div>
+                    <div class="item-price">
+                      {{ (item.price * item.quantity) | currency:'EUR':'symbol':'1.2-2' }}
+                    </div>
+                  </li>
+                }
+              </ul>
+
+              <div class="shipping-info">
+                <h4>Indirizzo di Spedizione</h4>
+                <p><strong>{{ order.firstName }} {{ order.lastName }}</strong></p>
+                <p>{{ order.address }}</p>
+                <p>{{ order.postalCode }} {{ order.city }}</p>
+                <p><i class="fa-solid fa-phone"></i> {{ order.phone }}</p>
+
+                @if (order.notes) {
+                  <p class="notes"><em>Note: {{ order.notes }}</em></p>
+                }
+              </div>
+
+              <div class="order-summary-footer">
+                <div class="summary-line total">
+                  <span>Totale Ordine:</span>
+                  <span>{{ order.totalAmount | currency:'EUR':'symbol':'1.2-2' }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</main>
+
+<app-footer></app-footer>

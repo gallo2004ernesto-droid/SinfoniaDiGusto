@@ -1,0 +1,468 @@
+<app-admin-header></app-admin-header>
+
+<div class="categories-container">
+
+  <!-- ===================================================== -->
+  <!-- HEADER -->
+  <!-- ===================================================== -->
+
+  <div class="header-actions">
+
+    <div>
+
+      <h2>
+
+        <i class="fa-solid fa-tags"></i>
+
+        Gestione Categorie
+
+      </h2>
+
+      <p>
+        Organizza i prodotti in categorie personalizzate
+      </p>
+
+    </div>
+
+    <button
+      class="btn-create"
+      type="button"
+      (click)="openCreateModal()"
+    >
+
+      <i class="fa-solid fa-plus"></i>
+
+      Nuova Categoria
+
+    </button>
+
+  </div>
+
+
+  <!-- ===================================================== -->
+  <!-- CARICAMENTO -->
+  <!-- ===================================================== -->
+
+  @if (isLoading()) {
+
+    <div class="state-message">
+
+      <i class="fa-solid fa-spinner fa-spin"></i>
+
+      Caricamento categorie...
+
+    </div>
+
+  } @else {
+
+    <!-- =================================================== -->
+    <!-- TABELLA -->
+    <!-- =================================================== -->
+
+    <div class="table-responsive">
+
+      <table class="data-table">
+
+        <thead>
+
+          <tr>
+
+            <th>
+
+              <i class="fa-solid fa-image"></i>
+
+              Immagine
+
+            </th>
+
+            <th>
+
+              <i class="fa-solid fa-tag"></i>
+
+              Nome Categoria
+
+            </th>
+
+            <th>
+
+              <i class="fa-solid fa-box"></i>
+
+              Prodotti
+
+            </th>
+
+            <th>
+
+              <i class="fa-solid fa-gear"></i>
+
+              Azioni
+
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          @for (
+            category of categories();
+            track category.id
+          ) {
+
+            <tr>
+
+              <!-- ========================================= -->
+              <!-- IMMAGINE -->
+              <!-- ========================================= -->
+
+              <td>
+
+                @if (category.imageUrl) {
+
+                  <img
+                    [src]="getImageUrl(category.imageUrl)"
+                    [alt]="category.name"
+                    class="category-thumb"
+                  />
+
+                } @else {
+
+                  <div class="no-thumb">
+
+                    <i class="fa-solid fa-tag"></i>
+
+                  </div>
+
+                }
+
+              </td>
+
+
+              <!-- ========================================= -->
+              <!-- NOME -->
+              <!-- ========================================= -->
+
+              <td>
+
+                <strong>
+                  {{ category.name }}
+                </strong>
+
+              </td>
+
+
+              <!-- ========================================= -->
+              <!-- PRODOTTI -->
+              <!-- ========================================= -->
+
+              <td>
+
+                <i class="fa-solid fa-box-open"></i>
+
+                {{ category.productCount ?? 0 }}
+
+                prodotti
+
+              </td>
+
+
+              <!-- ========================================= -->
+              <!-- AZIONI -->
+              <!-- ========================================= -->
+
+              <td class="action-buttons">
+
+                <button
+                  class="btn-edit"
+                  type="button"
+                  (click)="openEditModal(category)"
+                  title="Modifica categoria"
+                >
+
+                  <i class="fa-solid fa-pen-to-square"></i>
+
+                  Modifica
+
+                </button>
+
+
+                <button
+                  class="btn-delete"
+                  type="button"
+                  (click)="deleteCategory(category.id!)"
+                  title="Elimina categoria"
+                >
+
+                  <i class="fa-solid fa-trash"></i>
+
+                  Elimina
+
+                </button>
+
+              </td>
+
+            </tr>
+
+          } @empty {
+
+            <tr>
+
+              <td
+                colspan="4"
+                class="empty-cell"
+              >
+
+                <i class="fa-solid fa-folder-open"></i>
+
+                <span>
+                  Nessuna categoria creata.
+                </span>
+
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  }
+
+
+  <!-- ===================================================== -->
+  <!-- MODALE -->
+  <!-- ===================================================== -->
+
+  @if (showModal) {
+
+    <div
+      class="modal-backdrop"
+      (click)="closeModal()"
+    >
+
+      <div
+        class="modal-card"
+        (click)="$event.stopPropagation()"
+      >
+
+        <!-- =============================================== -->
+        <!-- TITOLO -->
+        <!-- =============================================== -->
+
+        <h3>
+
+          <i
+            class="fa-solid"
+            [ngClass]="
+              editingCategory
+                ? 'fa-pen-to-square'
+                : 'fa-plus-circle'
+            "
+          >
+          </i>
+
+          {{
+            editingCategory
+              ? 'Modifica Categoria'
+              : 'Nuova Categoria'
+          }}
+
+        </h3>
+
+
+        <!-- =============================================== -->
+        <!-- FORM -->
+        <!-- =============================================== -->
+
+        <form
+          [formGroup]="categoryForm"
+          (ngSubmit)="onSubmit()"
+        >
+
+          <!-- ============================================= -->
+          <!-- NOME -->
+          <!-- ============================================= -->
+
+          <div class="form-group">
+
+            <label for="name">
+
+              <i class="fa-solid fa-tag"></i>
+
+              Nome Categoria
+
+            </label>
+
+            <input
+              id="name"
+              type="text"
+              formControlName="name"
+              placeholder="Es. Torte artigianali"
+            />
+
+
+            @if (
+              categoryForm.controls.name.touched &&
+              categoryForm.controls.name.errors?.['required']
+            ) {
+
+              <small class="error-text">
+
+                <i
+                  class="fa-solid fa-circle-exclamation"
+                ></i>
+
+                Il nome è obbligatorio.
+
+              </small>
+
+            }
+
+          </div>
+
+
+          <!-- ============================================= -->
+          <!-- IMMAGINE -->
+          <!-- ============================================= -->
+
+          <div class="form-group">
+
+            <label for="image">
+
+              <i class="fa-solid fa-image"></i>
+
+              Immagine Categoria
+
+            </label>
+
+            <input
+              id="image"
+              type="file"
+              accept="image/*"
+              (change)="onImageSelected($event)"
+            />
+
+
+            @if (selectedImageFile) {
+
+              <small class="text-muted">
+
+                File selezionato:
+
+                {{ selectedImageFile.name }}
+
+              </small>
+
+            } @else if (editingCategory?.imageUrl) {
+
+              <small class="text-muted">
+
+                Lascia vuoto per mantenere
+                l'immagine attuale.
+
+              </small>
+
+            } @else {
+
+              <small class="text-muted">
+
+                Seleziona un'immagine dal computer.
+
+              </small>
+
+            }
+
+          </div>
+
+
+          <!-- ============================================= -->
+          <!-- ANTEPRIMA -->
+          <!-- ============================================= -->
+
+          @if (
+            editingCategory?.imageUrl &&
+            !selectedImageFile
+          ) {
+
+            <div class="form-group">
+
+              <label>
+                Immagine attuale
+              </label>
+
+              <img
+                [src]="getImageUrl(editingCategory?.imageUrl)"
+                [alt]="editingCategory?.name"
+                class="category-preview"
+              />
+
+            </div>
+
+          }
+
+
+          <!-- ============================================= -->
+          <!-- AZIONI -->
+          <!-- ============================================= -->
+
+          <div class="modal-actions">
+
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="closeModal()"
+            >
+
+              <i class="fa-solid fa-xmark"></i>
+
+              Annulla
+
+            </button>
+
+
+            <button
+              type="submit"
+              class="btn-save"
+              [disabled]="
+                categoryForm.invalid ||
+                isSaving()
+              "
+            >
+
+              @if (isSaving()) {
+
+                <i
+                  class="fa-solid fa-spinner fa-spin"
+                ></i>
+
+                Salvataggio...
+
+              } @else {
+
+                <i
+                  class="fa-solid fa-floppy-disk"
+                ></i>
+
+                Salva
+
+              }
+
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  }
+
+</div>

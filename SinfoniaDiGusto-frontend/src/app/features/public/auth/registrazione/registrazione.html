@@ -1,0 +1,58 @@
+<div class="register-container">
+    <h2>Crea un Account</h2>
+
+    @if(errorMessage){
+    <div class="error-alert">
+        {{ errorMessage}}
+    </div>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="firstName">Nome</label>
+                <input id="firstName" type="text" formControlName="firstName" placeholder="Mario">
+                @if(registerForm.controls.firstName.touched && registerForm.controls.firstName.errors?.['required']){
+                <small class="error-text">Il nome è obbligatorio</small>
+                }
+            </div>
+            <div class="form-group">
+                <label for="lastname">Cognome</label>
+                <input id="lastName" type="text" formControlName="lastName" placeholder="Rossi">
+                @if (registerForm.controls.lastName.touched && registerForm.controls.lastName.errors?.['required']) {
+                <small class="error-text">Il cognome è obbligatorio.</small>
+                }
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" type="email" formControlName="email" placeholder="mario.rossi@sinfoniadelgusto.com">
+            @if(registerForm.controls.email.errors?.['required']){
+            <small class="error-text">L'email è obbligatoria</small>
+            }@else if(registerForm.controls.email.errors?.['email']){
+            <small class="error-text">Inserisci un indirizzo email valido</small>
+            }
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input id="password" type="password" formControlName="password" placeholder="Almeno 6 caratteri" />
+            @if (registerForm.controls.password.touched) {
+            @if (registerForm.controls.password.errors?.['required']) {
+            <small class="error-text">La password è obbligatoria.</small>
+            } @else if (registerForm.controls.password.errors?.['minlength']) {
+            <small class="error-text">La password deve contenere almeno 6 caratteri.</small>
+            }
+            }
+        </div>
+
+        <button type="submit" [disabled]="registerForm.invalid || isLoading">
+            {{ isLoading ? 'Registrazione in corso...' : 'Registrati' }}
+        </button>
+    </form>
+
+    <p class="login-link">
+        Hai già un account? <a routerLink="/login">Accedi qui</a>
+    </p>
+</div>
