@@ -7,15 +7,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.it.unical.progetto.sinfoniadigusto.DTO.UserDTOs.UserProfileResponse;
+import com.it.unical.progetto.sinfoniadigusto.exception.BadRequestException;
 import com.it.unical.progetto.sinfoniadigusto.exception.ResourceNotFoundException;
 import com.it.unical.progetto.sinfoniadigusto.model.ClientUser;
+import com.it.unical.progetto.sinfoniadigusto.model.Role;
 import com.it.unical.progetto.sinfoniadigusto.repository.ClientUserRepository;
+import com.it.unical.progetto.sinfoniadigusto.repository.OrderRepository;
 
 @Service
 public class UserService {
 
+    private final OrderRepository orderRepository;
     @Autowired
     private ClientUserRepository userRepository;
+
+    UserService(OrderRepository orderRepository) {
+        this.orderRepository = orderRepository;
+    }
 
     public UserProfileResponse getUserProfile(String email) {
         ClientUser user = userRepository.findByEmail(email)
@@ -26,16 +34,30 @@ public class UserService {
 
     public List<UserProfileResponse> getAllUsers() {
         return userRepository.findAll().stream()
+                .filter(user -> !user.getRole().equals(Role.ROLE_ADMIN))
                 .map(this::mapToProfile)
                 .toList();
     }
 
     @Transactional
-    public void deleteUser(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new RuntimeException("Utente non trovato con id: " + userId);
+    public void deleteClient(Long id, String currentUserEmail) {
+        ClientUser user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente non trovato con ID: " + id));
+
+        if (user.getEmail().equals(currentUserEmail)) {
+            throw new BadRequestException("Non puoi eliminare il tuo stesso account.");
         }
-        userRepository.deleteById(userId);
+
+        if (user.getRole() == Role.ROLE_ADMIN) {
+            throw new BadRequestException("Un amministratore non può essere eliminato da qui.");
+        }
+
+        if (orderRepository.existsByUserId(id)) {
+            throw new BadRequestException(
+                    "Questo cliente ha degli ordini e non può essere eliminato. Puoi bloccarlo.");
+        }
+
+        userRepository.delete(user);
     }
 
     @Transactional

@@ -1,12 +1,11 @@
 package com.it.unical.progetto.sinfoniadigusto.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.it.unical.progetto.sinfoniadigusto.DTO.DashboardStatsDTOs.DashboardStatsResponse;
 import com.it.unical.progetto.sinfoniadigusto.repository.AdminStatsProductRepository;
 import com.it.unical.progetto.sinfoniadigusto.repository.CategoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AdminStatsService {

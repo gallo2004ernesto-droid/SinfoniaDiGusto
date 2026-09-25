@@ -1,17 +1,26 @@
 package com.it.unical.progetto.sinfoniadigusto.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.it.unical.progetto.sinfoniadigusto.DTO.BadgeDTOs.BadgeResponse;
 import com.it.unical.progetto.sinfoniadigusto.DTO.ProductDTOs.ProductRequest;
 import com.it.unical.progetto.sinfoniadigusto.DTO.ProductDTOs.ProductResponse;
+import com.it.unical.progetto.sinfoniadigusto.exception.BadRequestException;
 import com.it.unical.progetto.sinfoniadigusto.exception.ResourceNotFoundException;
+import com.it.unical.progetto.sinfoniadigusto.model.Badge;
 import com.it.unical.progetto.sinfoniadigusto.model.Category;
 import com.it.unical.progetto.sinfoniadigusto.model.Product;
+import com.it.unical.progetto.sinfoniadigusto.repository.BadgeRepository;
 import com.it.unical.progetto.sinfoniadigusto.repository.CategoryRepository;
 import com.it.unical.progetto.sinfoniadigusto.repository.ProductRepository;
 
@@ -25,11 +34,13 @@ public class ProductService {
     private CategoryRepository categoryRepository;
 
     @Autowired
+    private BadgeRepository badgeRepository;
+
+    @Autowired
     private FileStorageService fileStorageService;
 
-    // =========================================================
+
     // GET ALL
-    // =========================================================
     @Transactional(readOnly = true)
     public List<ProductResponse> getAllProducts() {
 
@@ -39,9 +50,7 @@ public class ProductService {
                 .toList();
     }
 
-    // =========================================================
     // GET BY ID
-    // =========================================================
     @Transactional(readOnly = true)
     public ProductResponse getProductById(Long id) {
 
@@ -55,9 +64,7 @@ public class ProductService {
         return mapToResponse(product);
     }
 
-    // =========================================================
     // GET BY CATEGORY
-    // =========================================================
     @Transactional(readOnly = true)
     public List<ProductResponse> getProductsByCategory(Long categoryId) {
 
@@ -67,22 +74,42 @@ public class ProductService {
                 .toList();
     }
 
-    // =========================================================
+    
     // SEARCH
-    // =========================================================
     @Transactional(readOnly = true)
     public List<ProductResponse> searchProducts(String keyword) {
 
-        return productRepository
-                .findByNameContainingIgnoreCase(keyword)
+        if (keyword == null || keyword.isBlank()) {
+            return List.of();
+        }
+
+        String term = keyword.trim();
+        String lowerTerm = term.toLowerCase();
+
+        return productRepository.search(term)
                 .stream()
+                .sorted(Comparator
+                        .comparingInt((Product p) -> searchRank(p, lowerTerm))
+                        .thenComparing(Product::getName, String.CASE_INSENSITIVE_ORDER))
                 .map(this::mapToResponse)
                 .toList();
     }
 
-    // =========================================================
+    // 0 = il nome inizia con la ricerca, 1 = il nome la contiene, 2 = solo descrizione o categoria
+    private int searchRank(Product product, String lowerTerm) {
+        String name = product.getName() == null ? "" : product.getName().toLowerCase();
+
+        if (name.startsWith(lowerTerm)) {
+            return 0;
+        }
+        if (name.contains(lowerTerm)) {
+            return 1;
+        }
+        return 2;
+    }
+
+    
     // LOW STOCK
-    // =========================================================
     @Transactional(readOnly = true)
     public List<ProductResponse> getLowStockProducts(Integer threshold) {
 
@@ -93,11 +120,14 @@ public class ProductService {
                 .toList();
     }
 
-    // =========================================================
+    
     // CREATE
-    // =========================================================
     @Transactional
-    public ProductResponse createProduct(ProductRequest request, MultipartFile imageFile, MultipartFile pdfFile) {
+    public ProductResponse createProduct(
+            ProductRequest request,
+            MultipartFile imageFile,
+            MultipartFile pdfFile
+    ) {
 
         // Recupera la categoria tramite ID
         Category category = categoryRepository
@@ -122,46 +152,23 @@ public class ProductService {
                 : 0
         );
 
+        // Prezzo originale (usato solo se il prodotto è in offerta)
+        product.setOriginalPrice(request.originalPrice());
+
+        // Colore background
+        product.setBgColor(request.bgColor());
+
         // Gestione file Immagine
         if (imageFile != null && !imageFile.isEmpty()) {
-            String savedImagePath = fileStorageService.storeFile(imageFile); // Salva il file e restituisce il path/url
+            String savedImagePath = fileStorageService.storeFile(imageFile);
             product.setImageUrl(savedImagePath);
         } else {
             product.setImageUrl(request.imageUrl()); // Fallback se viene passato un URL stringa
         }
 
-        // Prezzo originale
-        product.setOriginalPrice(
-                request.originalPrice()
-        );
-
-        // Offerta
-        product.setIsOffer(
-                request.isOffer() != null
-                ? request.isOffer()
-                : false
-        );
-
-        // Percentuale sconto
-        product.setDiscountPercent(
-                request.discountPercent()
-        );
-
-        // Prodotto in evidenza
-        product.setFeatured(
-                request.featured() != null
-                ? request.featured()
-                : false
-        );
-
-        // Colore background
-        product.setBgColor(
-                request.bgColor()
-        );
-
         // Gestione file PDF (Scheda Tecnica)
         if (pdfFile != null && !pdfFile.isEmpty()) {
-            String savedPdfPath = fileStorageService.storeFile(pdfFile); // Salva il file PDF sul server
+            String savedPdfPath = fileStorageService.storeFile(pdfFile);
             product.setPdfUrl(savedPdfPath);
         } else {
             product.setPdfUrl(request.pdfUrl()); // Fallback se viene passato un URL stringa
@@ -170,14 +177,18 @@ public class ProductService {
         // Categoria
         product.setCategory(category);
 
+        // Badge, flag derivati e sconto calcolato
+        applyBadges(product, request.badgeIds());
+        syncFlagsFromBadges(product);
+        applyPricing(product);
+
         Product saved = productRepository.save(product);
 
         return mapToResponse(saved);
     }
 
-    // =========================================================
+    
     // UPDATE
-    // =========================================================
     @Transactional
     public ProductResponse updateProduct(
             Long id,
@@ -193,9 +204,7 @@ public class ProductService {
                         )
                 );
 
-        // =========================================================
-        // CATEGORIA
-        // =========================================================
+        // Categoria
         Category category = categoryRepository
                 .findById(request.categoryId())
                 .orElseThrow(()
@@ -205,9 +214,7 @@ public class ProductService {
                         )
                 );
 
-        // =========================================================
-        // DATI PRINCIPALI
-        // =========================================================
+        // Dati principali
         product.setName(request.name());
         product.setDescription(request.description());
         product.setPrice(request.price());
@@ -218,83 +225,39 @@ public class ProductService {
                 : 0
         );
 
-        // =========================================================
-        // PREZZO ORIGINALE
-        // =========================================================
-        product.setOriginalPrice(
-                request.originalPrice()
-        );
+        // Prezzo originale (usato solo se il prodotto è in offerta)
+        product.setOriginalPrice(request.originalPrice());
 
-        // =========================================================
-        // OFFERTA
-        // =========================================================
-        product.setIsOffer(
-                request.isOffer() != null
-                ? request.isOffer()
-                : false
-        );
+        // Colore background
+        product.setBgColor(request.bgColor());
 
-        // =========================================================
-        // SCONTO
-        // =========================================================
-        product.setDiscountPercent(
-                request.discountPercent()
-        );
-
-        // =========================================================
-        // FEATURED
-        // =========================================================
-        product.setFeatured(
-                request.featured() != null
-                ? request.featured()
-                : false
-        );
-
-        // =========================================================
-        // BACKGROUND COLOR
-        // =========================================================
-        product.setBgColor(
-                request.bgColor()
-        );
-
-        // =========================================================
-        // IMMAGINE
-        // =========================================================
+        // Immagine (se non ne arriva una nuova resta quella attuale)
         if (imageFile != null && !imageFile.isEmpty()) {
-
-            String savedImagePath
-                    = fileStorageService.storeFile(imageFile);
-
+            String savedImagePath = fileStorageService.storeFile(imageFile);
             product.setImageUrl(savedImagePath);
         }
 
-        // =========================================================
-        // PDF
-        // =========================================================
+        // PDF (se non ne arriva uno nuovo resta quello attuale)
         if (pdfFile != null && !pdfFile.isEmpty()) {
-
-            String savedPdfPath
-                    = fileStorageService.storeFile(pdfFile);
-
+            String savedPdfPath = fileStorageService.storeFile(pdfFile);
             product.setPdfUrl(savedPdfPath);
         }
 
-        // =========================================================
-        // CATEGORIA
-        // =========================================================
+        // Categoria
         product.setCategory(category);
 
-        // =========================================================
-        // SALVATAGGIO
-        // =========================================================
+        // Badge, flag derivati e sconto calcolato
+        applyBadges(product, request.badgeIds());
+        syncFlagsFromBadges(product);
+        applyPricing(product);
+
         Product updated = productRepository.save(product);
 
         return mapToResponse(updated);
     }
 
-    // =========================================================
+    
     // DELETE
-    // =========================================================
     @Transactional
     public void deleteProduct(Long id) {
 
@@ -308,10 +271,78 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    // =========================================================
+    
+    // BADGE
+    // badgeIds == null  -> i badge restano invariati
+    // badgeIds vuota    -> tutti i badge vengono tolti
+    private void applyBadges(Product product, List<Long> badgeIds) {
+
+        if (badgeIds == null) {
+            return;
+        }
+
+        Set<Long> ids = new HashSet<>(badgeIds);
+        List<Badge> found = badgeRepository.findAllById(ids);
+
+        if (found.size() != ids.size()) {
+            throw new ResourceNotFoundException(
+                    "Uno o più badge selezionati non esistono."
+            );
+        }
+
+        product.getBadges().clear();
+        product.getBadges().addAll(found);
+    }
+
+    // I flag isOffer e featured derivano dai badge di sistema assegnati
+    private void syncFlagsFromBadges(Product product) {
+        product.setIsOffer(hasBadge(product, BadgeService.CODE_OFFER));
+        product.setFeatured(hasBadge(product, BadgeService.CODE_FEATURED));
+    }
+
+    private boolean hasBadge(Product product, String code) {
+        return product.getBadges().stream()
+                .anyMatch(b -> code.equals(b.getCode()));
+    }
+
+    // PREZZI E SCONTO
+    // Con il badge "In Offerta": prezzo originale obbligatorio (> prezzo),
+    // sconto calcolato. Senza il badge: prezzo originale e sconto azzerati.
+    private void applyPricing(Product product) {
+
+        if (!hasBadge(product, BadgeService.CODE_OFFER)) {
+            product.setOriginalPrice(null);
+            product.setDiscountPercent(null);
+            return;
+        }
+
+        BigDecimal price = product.getPrice();
+        BigDecimal original = product.getOriginalPrice();
+
+        if (price == null
+                || original == null
+                || original.compareTo(price) <= 0) {
+
+            throw new BadRequestException(
+                    "Con il badge \"In Offerta\" il Prezzo originale deve essere maggiore del Prezzo."
+            );
+        }
+
+        BigDecimal discount = original.subtract(price)
+                .multiply(BigDecimal.valueOf(100))
+                .divide(original, 0, RoundingMode.HALF_UP);
+
+        product.setDiscountPercent(discount.intValue());
+    }
+
+    
     // MAPPING ENTITY -> RESPONSE
-    // =========================================================
     private ProductResponse mapToResponse(Product product) {
+
+        List<BadgeResponse> badges = product.getBadges().stream()
+                .sorted(Comparator.comparing(Badge::getName))
+                .map(BadgeService::toResponse)
+                .toList();
 
         return new ProductResponse(
                 product.getId(),
@@ -327,7 +358,8 @@ public class ProductService {
                 product.getBgColor(),
                 product.getPdfUrl(),
                 product.getCategory().getId(),
-                product.getCategory().getName()
+                product.getCategory().getName(),
+                badges
         );
     }
 }

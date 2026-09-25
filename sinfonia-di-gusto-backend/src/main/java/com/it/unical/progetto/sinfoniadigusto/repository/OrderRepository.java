@@ -1,13 +1,12 @@
 package com.it.unical.progetto.sinfoniadigusto.repository;
 
-import com.it.unical.progetto.sinfoniadigusto.model.OrderStatus;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List; 
-
 import com.it.unical.progetto.sinfoniadigusto.model.Order;
+import com.it.unical.progetto.sinfoniadigusto.model.OrderStatus;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
@@ -18,5 +17,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByStatusOrderByOrderDateDesc(OrderStatus status);
 
     List<Order> findAllByOrderByOrderDateDesc();
+
+    boolean existsByUserId(Long userId);
 
 }

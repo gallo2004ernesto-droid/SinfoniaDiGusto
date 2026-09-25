@@ -1,13 +1,15 @@
 package com.it.unical.progetto.sinfoniadigusto.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.it.unical.progetto.sinfoniadigusto.DTO.CategoryDTOs.*;
+import com.it.unical.progetto.sinfoniadigusto.DTO.CategoryDTOs.AdminCategoryResponse;
 import com.it.unical.progetto.sinfoniadigusto.DTO.CategoryDTOs.CategoryRequest;
 import com.it.unical.progetto.sinfoniadigusto.DTO.CategoryDTOs.CategoryResponse;
 import com.it.unical.progetto.sinfoniadigusto.exception.BadRequestException;
@@ -24,17 +26,44 @@ public class CategoryService {
     @Autowired
     private FileStorageService fileStorageService;
 
+    // ---------- Pubblico: senza conteggio ----------
+
     public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAll().stream()
-                .map(cat -> new CategoryResponse(cat.getId(), cat.getName(), cat.getImageUrl()))
+                .map(cat -> new CategoryResponse(
+                        cat.getId(),
+                        cat.getName(),
+                        cat.getImageUrl()))
                 .toList();
     }
 
     public CategoryResponse getCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria non trovata con ID: " + id));
-        return new CategoryResponse(category.getId(), category.getName(), category.getImageUrl());
+        return new CategoryResponse(
+                category.getId(),
+                category.getName(),
+                category.getImageUrl());
     }
+
+    // ---------- Solo admin: con conteggio ----------
+
+    public List<AdminCategoryResponse> getAllCategoriesForAdmin() {
+        Map<Long, Long> counts = categoryRepository.countProductsPerCategory().stream()
+                .collect(Collectors.toMap(
+                        CategoryRepository.CategoryProductCount::getCategoryId,
+                        CategoryRepository.CategoryProductCount::getTotal));
+
+        return categoryRepository.findAll().stream()
+                .map(cat -> new AdminCategoryResponse(
+                        cat.getId(),
+                        cat.getName(),
+                        cat.getImageUrl(),
+                        counts.getOrDefault(cat.getId(), 0L)))
+                .toList();
+    }
+
+    // ---------- Scrittura ----------
 
     @Transactional
     public CategoryResponse createCategory(
@@ -42,37 +71,25 @@ public class CategoryService {
             MultipartFile imageFile) {
 
         if (categoryRepository.existsByName(request.name())) {
-            throw new BadRequestException(
-                    "Esiste già una categoria con questo nome."
-            );
+            throw new BadRequestException("Esiste già una categoria con questo nome.");
         }
 
         Category category = new Category();
-
         category.setName(request.name());
 
-        // Gestione immagine
         if (imageFile != null && !imageFile.isEmpty()) {
-
-            String savedImagePath
-                    = fileStorageService.storeFile(imageFile);
-
-            category.setImageUrl(savedImagePath);
-
+            category.setImageUrl(fileStorageService.storeFile(imageFile));
         } else {
-
             // Fallback: eventuale URL passato dal frontend
             category.setImageUrl(request.imgeUrl());
         }
 
-        Category saved
-                = categoryRepository.save(category);
+        Category saved = categoryRepository.save(category);
 
         return new CategoryResponse(
                 saved.getId(),
                 saved.getName(),
-                saved.getImageUrl()
-        );
+                saved.getImageUrl());
     }
 
     @Transactional
@@ -82,43 +99,27 @@ public class CategoryService {
             MultipartFile imageFile) {
 
         Category category = categoryRepository.findById(id)
-                .orElseThrow(()
-                        -> new ResourceNotFoundException(
-                                "Categoria non trovata con ID: " + id
-                        )
-                );
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria non trovata con ID: " + id));
 
         if (!category.getName().equalsIgnoreCase(request.name())
                 && categoryRepository.existsByName(request.name())) {
-
-            throw new BadRequestException(
-                    "Esiste già un'altra categoria con questo nome."
-            );
+            throw new BadRequestException("Esiste già un'altra categoria con questo nome.");
         }
 
         category.setName(request.name());
 
-        // Se è stata selezionata una nuova immagine,
-        // la salviamo e sostituiamo quella precedente.
+        // Se arriva una nuova immagine sostituisce la vecchia,
+        // altrimenti imageUrl resta invariato.
         if (imageFile != null && !imageFile.isEmpty()) {
-
-            String savedImagePath
-                    = fileStorageService.storeFile(imageFile);
-
-            category.setImageUrl(savedImagePath);
+            category.setImageUrl(fileStorageService.storeFile(imageFile));
         }
 
-        // Se NON arriva una nuova immagine,
-        // non tocchiamo category.imageUrl.
-        // Quindi rimane quella vecchia.
-        Category updated
-                = categoryRepository.save(category);
+        Category updated = categoryRepository.save(category);
 
         return new CategoryResponse(
                 updated.getId(),
                 updated.getName(),
-                updated.getImageUrl()
-        );
+                updated.getImageUrl());
     }
 
     @Transactional
@@ -126,7 +127,10 @@ public class CategoryService {
         if (!categoryRepository.existsById(id)) {
             throw new ResourceNotFoundException("Categoria non trovata con ID: " + id);
         }
+        if (categoryRepository.countProductsByCategoryId(id) > 0) {
+            throw new BadRequestException(
+                    "Impossibile eliminare la categoria: contiene ancora dei prodotti.");
+        }
         categoryRepository.deleteById(id);
     }
-
 }

@@ -1,14 +1,13 @@
 package com.it.unical.progetto.sinfoniadigusto.service;
 
+import com.it.unical.progetto.sinfoniadigusto.DTO.AdminProfileDTOs.ChangePasswordPayload;
+import com.it.unical.progetto.sinfoniadigusto.DTO.AdminProfileDTOs.UpdateProfilePayload;
+import com.it.unical.progetto.sinfoniadigusto.model.ClientUser; // Modifica con la tua classe Entity Admin/User
+import com.it.unical.progetto.sinfoniadigusto.model.Role;
+import com.it.unical.progetto.sinfoniadigusto.repository.ClientUserRepository; // Modifica col tuo Repository
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service; // Modifica con la tua classe Entity Admin/User
-
-import com.it.unical.progetto.sinfoniadigusto.DTO.AdminProfileDTOs.ChangePasswordPayload;
-import com.it.unical.progetto.sinfoniadigusto.DTO.AdminProfileDTOs.UpdateProfilePayload; // Modifica col tuo Repository
-import com.it.unical.progetto.sinfoniadigusto.model.ClientUser;
-import com.it.unical.progetto.sinfoniadigusto.model.Role;
-import com.it.unical.progetto.sinfoniadigusto.repository.ClientUserRepository;
+import org.springframework.stereotype.Service;
 
 @Service
 public class AdminProfileService {
@@ -28,7 +27,7 @@ public class AdminProfileService {
     }
 
     public ClientUser updateProfile(UpdateProfilePayload payload) {
-        ClientUser admin = getAdminProfile();
+    	ClientUser admin = getAdminProfile();
         admin.setFirstName(payload.name());
         admin.setEmail(payload.email());
         return userRepository.save(admin);

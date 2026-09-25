@@ -1,8 +1,9 @@
 package com.it.unical.progetto.sinfoniadigusto.DTO;
 
-import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import com.it.unical.progetto.sinfoniadigusto.model.OrderStatus;
 
 public class OrderDTOs {
@@ -18,7 +19,8 @@ public class OrderDTOs {
         String city,
         String postalCode,
         String notes,
-        String paymentMethod
+        String paymentMethod,
+        String couponCode
     ) {}
 
     public record OrderItemResponse(
@@ -26,10 +28,11 @@ public class OrderDTOs {
         Long productId, 
         String productName, 
         Integer quantity, 
-        BigDecimal price
+        BigDecimal price,
+        String productImageUrl
     ) {}
 
-    // Record esteso per includere tutti i dati di spedizione e pagamento
+    // Record esteso per includere tutti i dati di spedizione, pagamento e sconto
     public record OrderResponse(
         Long id, 
         Long userId, 
@@ -45,6 +48,10 @@ public class OrderDTOs {
         String postalCode,
         String notes,
         String paymentMethod,
-        List<OrderItemResponse> items
+        List<OrderItemResponse> items,
+        String couponCode,
+        BigDecimal discountAmount,
+        BigDecimal subtotal,
+        BigDecimal shippingCost
     ) {}
 }
