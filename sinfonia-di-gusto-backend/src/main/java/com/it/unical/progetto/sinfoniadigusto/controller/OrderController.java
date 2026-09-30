@@ -26,11 +26,11 @@ import com.it.unical.progetto.sinfoniadigusto.service.OrderService;
 @RequestMapping("api/v1/orders")
 @CrossOrigin(origins = "*")
 public class OrderController {
-	
-	@Autowired
-	private OrderService orderService;
-	
-	@PostMapping
+
+    @Autowired
+    private OrderService orderService;
+
+    @PostMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<OrderResponse> createOrder(@RequestBody CreateOrderRequest request, Authentication authentication) {
         String userEmail = authentication.getName();
@@ -62,5 +62,11 @@ public class OrderController {
     public ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable Long orderId, @RequestParam OrderStatus status) {
         return ResponseEntity.ok(orderService.updateOrderStatus(orderId, status));
     }
-	
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long id, Authentication authentication) {
+        return ResponseEntity.ok(orderService.getOrderById(id, authentication.getName()));
+    }
+
 }

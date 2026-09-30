@@ -1,6 +1,5 @@
 package com.it.unical.progetto.sinfoniadigusto.config;
 
-import com.it.unical.progetto.sinfoniadigusto.repository.ClientUserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,6 +19,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.it.unical.progetto.sinfoniadigusto.repository.ClientUserRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -48,15 +49,20 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults()) // Utilizza la configurazione definita in WebConfig
                 .authorizeHttpRequests(auth -> auth
-                		.requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/v1/products/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT,"/api/v1/products/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE,"/api/v1/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/categories").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/categories/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/badges/admin").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/badges").permitAll()
+                        .requestMatchers("/api/v1/badges/**").hasRole("ADMIN")
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -70,14 +76,13 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider =
-                new DaoAuthenticationProvider(userDetailsService());
+        DaoAuthenticationProvider authProvider
+                = new DaoAuthenticationProvider(userDetailsService());
 
         authProvider.setPasswordEncoder(passwordEncoder());
 
         return authProvider;
     }
-
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {

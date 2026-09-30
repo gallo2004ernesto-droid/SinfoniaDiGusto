@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,6 +42,13 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserProfileResponse> toggleUserStatus(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.toggleUserStatus(userId));
+    }
+
+    @DeleteMapping("/admin/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteClient(@PathVariable Long id, Authentication authentication) {
+        userService.deleteClient(id, authentication.getName());
+        return ResponseEntity.noContent().build();
     }
     
 
