@@ -1,188 +1,188 @@
-import { Injectable, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+// import { Injectable, inject, signal } from '@angular/core';
+// import { Observable, tap } from 'rxjs';
 
-import { OrderApiService } from './order-api.services';
-import { CartStateService } from './cart.services';
+// import { OrderApiService } from './order-api.services';
+// import { CartStateService } from './cart.services';
 
-import {
-  Order as CheckoutOrder,
-  OrderResponse,
-  PaymentMethod,
-  ShippingDetails
-} from '../model/checkout.model';
+// import {
+//   Order as CheckoutOrder,
+//   OrderResponse,
+//   PaymentMethod,
+//   ShippingDetails
+// } from '../model/checkout.model';
 
-import {
-  OrderResponse as Ordini,
-  OrderStatus
-} from '../model/order-status.model';
-
-
-@Injectable({
-  providedIn: 'root'
-})
-export class OrderService {
-
-  private orderApi = inject(OrderApiService);
-  private cartState = inject(CartStateService);
-
-  // Lista degli ordini dell'utente
-  orders = signal<OrderStatus[]>([]);
-
-  ordini = signal<Ordini[]>([]);
-
-  // Stato caricamento
-  isLoading = signal<boolean>(false);
-
-  // Errore
-  error = signal<string | null>(null);
+// import {
+//   OrderResponse as Ordini,
+//   OrderStatus
+// } from '../model/order-status.model';
 
 
-  /**
-   * Carica la lista degli ordini dell'utente
-   */
-  loadMyOrders(): void {
+// @Injectable({
+//   providedIn: 'root'
+// })
+// export class OrderService {
 
-    this.isLoading.set(true);
-    this.error.set(null);
+//   private orderApi = inject(OrderApiService);
+//   private cartState = inject(CartStateService);
 
-    this.orderApi.getMyOrders().subscribe({
+//   // Lista degli ordini dell'utente
+//   orders = signal<OrderStatus[]>([]);
 
-      next: (data) => {
-        this.isLoading.set(false);
-      },
+//   ordini = signal<Ordini[]>([]);
 
-      error: (err) => {
-        console.error(
-          'Errore durante il recupero degli ordini:',
-          err
-        );
+//   // Stato caricamento
+//   isLoading = signal<boolean>(false);
 
-        this.error.set(
-          'Impossibile caricare la lista degli ordini.'
-        );
-
-        this.isLoading.set(false);
-      }
-
-    });
-  }
+//   // Errore
+//   error = signal<string | null>(null);
 
 
-  /**
-   * Converte lo stato dell'ordine
-   * in etichetta e classe CSS.
-   */
-  getStatusBadge(
-    status: OrderStatus
-  ): { label: string; class: string } {
+//   /**
+//    * Carica la lista degli ordini dell'utente
+//    */
+//   loadMyOrders(): void {
 
-    switch (status) {
+//     this.isLoading.set(true);
+//     this.error.set(null);
 
-      case 'PENDING':
-        return {
-          label: 'In Attesa',
-          class: 'status-pending'
-        };
+//     this.orderApi.getMyOrders().subscribe({
 
-      case 'PROCESSING':
-        return {
-          label: 'In Lavorazione',
-          class: 'status-processing'
-        };
+//       next: (data) => {
+//         this.isLoading.set(false);
+//       },
 
-      case 'SHIPPED':
-        return {
-          label: 'Spedito',
-          class: 'status-shipped'
-        };
+//       error: (err) => {
+//         console.error(
+//           'Errore durante il recupero degli ordini:',
+//           err
+//         );
 
-      case 'DELIVERED':
-        return {
-          label: 'Consegnato',
-          class: 'status-delivered'
-        };
+//         this.error.set(
+//           'Impossibile caricare la lista degli ordini.'
+//         );
 
-      case 'CANCELLED':
-        return {
-          label: 'Annullato',
-          class: 'status-cancelled'
-        };
-      case 'PAID':
-        return {
-          label: 'Annullato',
-          class: 'status-cancelled'
-        };
+//         this.isLoading.set(false);
+//       }
 
-      default:
-        return {
-          label: 'Sconosciuto',
-          class: ''
-        };
-    }
-  }
+//     });
+//   }
 
 
-  /**
-   * Calcola le spese di spedizione.
-   */
-  calculateShippingCost(
-    subtotal: number
-  ): number {
+//   /**
+//    * Converte lo stato dell'ordine
+//    * in etichetta e classe CSS.
+//    */
+//   getStatusBadge(
+//     status: OrderStatus
+//   ): { label: string; class: string } {
 
-    return subtotal > 50 ? 0 : 5;
-  }
+//     switch (status) {
+
+//       case 'PENDING':
+//         return {
+//           label: 'In Attesa',
+//           class: 'status-pending'
+//         };
+
+//       case 'PROCESSING':
+//         return {
+//           label: 'In Lavorazione',
+//           class: 'status-processing'
+//         };
+
+//       case 'SHIPPED':
+//         return {
+//           label: 'Spedito',
+//           class: 'status-shipped'
+//         };
+
+//       case 'DELIVERED':
+//         return {
+//           label: 'Consegnato',
+//           class: 'status-delivered'
+//         };
+
+//       case 'CANCELLED':
+//         return {
+//           label: 'Annullato',
+//           class: 'status-cancelled'
+//         };
+//       case 'PAID':
+//         return {
+//           label: 'Annullato',
+//           class: 'status-cancelled'
+//         };
+
+//       default:
+//         return {
+//           label: 'Sconosciuto',
+//           class: ''
+//         };
+//     }
+//   }
 
 
-  /**
-   * Crea e invia un nuovo ordine.
-   */
-  placeOrder(
-    shippingData: ShippingDetails,
-    paymentMethod: PaymentMethod
-  ): Observable<OrderResponse> {
+//   /**
+//    * Calcola le spese di spedizione.
+//    */
+//   calculateShippingCost(
+//     subtotal: number
+//   ): number {
 
-    const items = this.cartState.cartItems();
-
-    const subtotal = this.cartState.totalPrice();
-
-    const shippingCost =
-      this.calculateShippingCost(subtotal);
-
-    const total =
-      subtotal + shippingCost;
+//     return subtotal > 50 ? 0 : 5;
+//   }
 
 
-    const orderPayload: CheckoutOrder = {
+//   /**
+//    * Crea e invia un nuovo ordine.
+//    */
+//   placeOrder(
+//     shippingData: ShippingDetails,
+//     paymentMethod: PaymentMethod
+//   ): Observable<OrderResponse> {
 
-      items,
+//     const items = this.cartState.cartItems();
 
-      shipping: shippingData,
+//     const subtotal = this.cartState.totalPrice();
 
-      paymentMethod,
+//     const shippingCost =
+//       this.calculateShippingCost(subtotal);
 
-      subTotal: subtotal,
-
-      shippingCost,
-
-      total,
-
-      createdAt: new Date()
-    };
+//     const total =
+//       subtotal + shippingCost;
 
 
-    return this.orderApi
-      .postOrder(orderPayload)
-      .pipe(
+//     const orderPayload: CheckoutOrder = {
 
-        tap((response) => {
+//       items,
 
-          if (response.success) {
-            this.cartState.clear();
-          }
+//       shipping: shippingData,
 
-        })
+//       paymentMethod,
 
-      );
-  }
+//       subTotal: subtotal,
 
-}
+//       shippingCost,
+
+//       total,
+
+//       createdAt: new Date()
+//     };
+
+
+//     return this.orderApi
+//       .postOrder(orderPayload)
+//       .pipe(
+
+//         tap((response) => {
+
+//           if (response.success) {
+//             this.cartState.clear();
+//           }
+
+//         })
+
+//       );
+//   }
+
+// }

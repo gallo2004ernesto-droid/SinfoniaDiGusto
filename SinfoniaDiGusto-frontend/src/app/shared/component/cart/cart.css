@@ -1,10 +1,7 @@
 /* Overlay */
 .cart-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 998;
   opacity: 0;
@@ -21,19 +18,25 @@
 .cart-drawer {
   position: fixed;
   top: 0;
-  right: -400px;
-  width: 380px;
+  right: 0;
+  width: min(380px, 100%);
   height: 100vh;
+  height: 100dvh; /* evita il salto della barra indirizzi su mobile */
   background-color: #ffffff;
   z-index: 999;
   box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
-  transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0.35s;
+  overscroll-behavior: contain;
 }
 
 .cart-drawer.open {
-  right: 0;
+  transform: translateX(0);
+  visibility: visible;
 }
 
 /* Header */
@@ -41,15 +44,17 @@
   background-color: var(--primary-brown, #3e2723);
   color: #ffffff;
   padding: 18px 24px;
+  padding-top: max(18px, env(safe-area-inset-top));
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .cart-header h3 {
   margin: 0;
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 1.3rem;
+  font-size: clamp(1.1rem, 4vw, 1.3rem);
 }
 
 .close-btn {
@@ -58,6 +63,12 @@
   color: #ffffff;
   font-size: 1.2rem;
   cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: -10px;
 }
 
 /* Content */
@@ -65,6 +76,8 @@
   flex: 1;
   padding: 20px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .empty-cart {
@@ -91,12 +104,14 @@
 .item-img {
   width: 65px;
   height: 65px;
+  flex-shrink: 0;
   object-fit: cover;
   border-radius: 8px;
 }
 
 .item-details {
   flex: 1;
+  min-width: 0; /* permette al testo lungo di andare a capo/troncarsi */
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -106,6 +121,7 @@
   font-weight: 600;
   font-size: 0.9rem;
   color: var(--primary-brown, #3e2723);
+  overflow-wrap: anywhere;
 }
 
 .item-price {
@@ -123,8 +139,8 @@
 .quantity-controls button {
   background-color: var(--announcement-bg, #f5efe6);
   border: 1px solid #ddd;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
@@ -136,13 +152,16 @@
   color: var(--accent-pink, #e91e63);
   cursor: pointer;
   padding: 6px;
+  flex-shrink: 0;
 }
 
 /* Footer */
 .cart-footer {
   padding: 20px;
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
   background-color: var(--cream-bg, #fdfaf6);
   border-top: 1px solid #eaeaea;
+  flex-shrink: 0;
 }
 
 .summary-row {
@@ -177,4 +196,83 @@
 .checkout-btn:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
+}
+
+/* ---------- Tablet ---------- */
+@media (max-width: 768px) {
+  .cart-drawer {
+    width: min(360px, 90%);
+  }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 480px) {
+  .cart-drawer {
+    width: 100%;
+    box-shadow: none;
+  }
+
+  .cart-header {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .cart-body {
+    padding: 16px;
+  }
+
+  .cart-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .item-img {
+    width: 56px;
+    height: 56px;
+  }
+
+  /* target touch più comodi */
+  .quantity-controls button {
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+
+  .remove-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .checkout-btn {
+    padding: 16px;
+  }
+}
+
+/* ---------- Schermi bassi (telefono in orizzontale) ---------- */
+@media (max-height: 500px) {
+  .cart-header {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .cart-footer {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .summary-row {
+    margin-bottom: 10px;
+  }
+
+  .checkout-btn {
+    padding: 10px;
+  }
+}
+
+/* ---------- Riduci animazioni se richiesto ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .cart-drawer,
+  .cart-overlay {
+    transition: none;
+  }
 }

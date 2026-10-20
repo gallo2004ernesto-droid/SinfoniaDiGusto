@@ -1,0 +1,77 @@
+<app-header (toggleCartEvent)="openCart()"></app-header>
+
+<main class="search-container">
+
+  <header class="search-header">
+    <h1>Il Nostro Catalogo</h1>
+    <p>Tutte le nostre creazioni preparate ogni giorno</p>
+
+    @if (query() && !isLoading() && !error()) {
+      <p class="search-summary">
+        {{ results().length }}
+        {{ results().length === 1 ? 'risultato' : 'risultati' }}
+        per <strong>«{{ query() }}»</strong>
+      </p>
+    }
+  </header>
+
+  @if (isLoading()) {
+
+    <div class="state-box">
+      <i class="fa-solid fa-circle-notch fa-spin"></i>
+      <span>Ricerca in corso...</span>
+    </div>
+
+  } @else if (error()) {
+
+    <div class="state-box">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span>{{ error() }}</span>
+    </div>
+
+  } @else if (!query()) {
+
+    <div class="state-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <p>Scrivi il nome di un dolce, di un ingrediente o di una categoria.</p>
+      <a routerLink="/prodotti" class="reset-link">Sfoglia il catalogo</a>
+    </div>
+
+  } @else if (results().length === 0) {
+
+    <div class="state-box">
+      <i class="fa-solid fa-cookie-bite"></i>
+      <p>Nessun prodotto trovato per «{{ query() }}».</p>
+      <p class="tip">Controlla l'ortografia o prova con una parola più breve.</p>
+      <a routerLink="/prodotti" class="reset-link">Sfoglia il catalogo</a>
+    </div>
+
+  } @else {
+
+    <div class="toolbar">
+      <label for="sort">Ordina per</label>
+
+      <select id="sort" class="sort-select" [value]="sortBy()" (change)="onSortChange($any($event.target).value)">
+        <option value="RELEVANCE">Rilevanza</option>
+        <option value="PRICE_ASC">Prezzo: dal più basso</option>
+        <option value="PRICE_DESC">Prezzo: dal più alto</option>
+        <option value="NAME">Nome (A-Z)</option>
+      </select>
+    </div>
+
+    <section class="products-grid">
+      @for (product of sortedResults(); track product.id) {
+        <app-product-card [product]="product"></app-product-card>
+      }
+    </section>
+
+  }
+
+</main>
+
+<app-footer></app-footer>
+
+<app-cart
+  [isOpen]="cartOpen"
+  (closeCart)="closeCart()">
+</app-cart>

@@ -39,8 +39,9 @@ public class ProductService {
     @Autowired
     private FileStorageService fileStorageService;
 
-
+    
     // GET ALL
+    
     @Transactional(readOnly = true)
     public List<ProductResponse> getAllProducts() {
 
@@ -50,7 +51,9 @@ public class ProductService {
                 .toList();
     }
 
+    
     // GET BY ID
+    
     @Transactional(readOnly = true)
     public ProductResponse getProductById(Long id) {
 
@@ -64,7 +67,9 @@ public class ProductService {
         return mapToResponse(product);
     }
 
+    
     // GET BY CATEGORY
+    
     @Transactional(readOnly = true)
     public List<ProductResponse> getProductsByCategory(Long categoryId) {
 
@@ -76,6 +81,7 @@ public class ProductService {
 
     
     // SEARCH
+    
     @Transactional(readOnly = true)
     public List<ProductResponse> searchProducts(String keyword) {
 
@@ -110,6 +116,7 @@ public class ProductService {
 
     
     // LOW STOCK
+    
     @Transactional(readOnly = true)
     public List<ProductResponse> getLowStockProducts(Integer threshold) {
 
@@ -122,6 +129,7 @@ public class ProductService {
 
     
     // CREATE
+    
     @Transactional
     public ProductResponse createProduct(
             ProductRequest request,
@@ -189,6 +197,7 @@ public class ProductService {
 
     
     // UPDATE
+    
     @Transactional
     public ProductResponse updateProduct(
             Long id,
@@ -258,6 +267,7 @@ public class ProductService {
 
     
     // DELETE
+    
     @Transactional
     public void deleteProduct(Long id) {
 
@@ -273,6 +283,7 @@ public class ProductService {
 
     
     // BADGE
+    
     // badgeIds == null  -> i badge restano invariati
     // badgeIds vuota    -> tutti i badge vengono tolti
     private void applyBadges(Product product, List<Long> badgeIds) {
@@ -305,7 +316,9 @@ public class ProductService {
                 .anyMatch(b -> code.equals(b.getCode()));
     }
 
+    
     // PREZZI E SCONTO
+    
     // Con il badge "In Offerta": prezzo originale obbligatorio (> prezzo),
     // sconto calcolato. Senza il badge: prezzo originale e sconto azzerati.
     private void applyPricing(Product product) {
@@ -337,6 +350,7 @@ public class ProductService {
 
     
     // MAPPING ENTITY -> RESPONSE
+    
     private ProductResponse mapToResponse(Product product) {
 
         List<BadgeResponse> badges = product.getBadges().stream()

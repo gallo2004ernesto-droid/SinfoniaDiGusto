@@ -1,18 +1,4 @@
-// export interface Product {
-//   id?: number;
-//   name: string;
-//   description: string;
-//   price: number;
-//   originalPrice?: number;
-//   onSale?: boolean;
-//   discountPercent?: number;
-//   category: string;
-//   categoryId: number;
-//   imageUrl: string;
-//   bgColor?: string;
-//   featured?: boolean;
-//   pdfUrl?: string;
-// }
+import { Badge } from '../../../core/model/badge.model';
 
 export interface Product {
   id?: number;
@@ -27,6 +13,7 @@ export interface Product {
   imageUrl?: string;
   bgColor?: string;
   pdfUrl?: string;
-  category: string;
   categoryId: number;
+  categoryName?: string;
+  badges?: Badge[];
 }

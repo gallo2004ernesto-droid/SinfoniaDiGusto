@@ -84,7 +84,9 @@ public class CouponService {
         couponRepository.deleteById(id);
     }
 
+    
     // CHECKOUT: ANTEPRIMA SCONTO
+    
     @Transactional(readOnly = true)
     public CouponValidationResponse validate(CouponValidateRequest request) {
 
@@ -116,7 +118,10 @@ public class CouponService {
                 subtotal.subtract(discount)
         );
     }
-   
+
+    
+    // USATI ANCHE DALLA CREAZIONE ORDINE
+    
     // Restituisce il coupon se è utilizzabile, altrimenti lancia un errore leggibile
     public Coupon getUsableCoupon(String rawCode, BigDecimal subtotal) {
 
@@ -186,8 +191,9 @@ public class CouponService {
         return "ACTIVE";
     }
 
-
+    
     // HELPER
+    
     private String normalizeCode(String code) {
         if (code == null || code.isBlank()) {
             throw new BadRequestException("Il codice è obbligatorio.");

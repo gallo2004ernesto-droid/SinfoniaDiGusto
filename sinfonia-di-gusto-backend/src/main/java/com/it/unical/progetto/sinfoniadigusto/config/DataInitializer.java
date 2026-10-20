@@ -66,7 +66,6 @@ public class DataInitializer implements CommandLineRunner {
 
     
     // BADGE DI SISTEMA
-    
     private void createSystemBadges() {
         try {
             transactionTemplate.executeWithoutResult(status -> {

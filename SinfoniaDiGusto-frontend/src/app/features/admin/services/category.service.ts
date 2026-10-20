@@ -4,7 +4,7 @@ import {
   HttpHeaders
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Category } from '../model/category.model';
+import { Category, AdminCategory } from '../model/category.model';
 
 @Injectable({
   providedIn: 'root'
@@ -17,9 +17,9 @@ export class CategoryService {
     'http://localhost:8080/api/v1/categories';
 
 
-  // =========================================================
+  
   // HEADER AUTENTICAZIONE
-  // =========================================================
+  
 
   private getAuthHeaders(): HttpHeaders {
 
@@ -37,9 +37,9 @@ export class CategoryService {
   }
 
 
-  // =========================================================
+  
   // GET CATEGORIE
-  // =========================================================
+  
 
   getCategories(): Observable<Category[]> {
 
@@ -48,10 +48,14 @@ export class CategoryService {
     );
   }
 
+  getAdminCategories(): Observable<AdminCategory[]> {
+    return this.http.get<AdminCategory[]>(`${this.apiUrl}/admin`);
+  }
 
-  // =========================================================
+
+  
   // CREATE
-  // =========================================================
+  
 
   createCategory(
     name: string,
@@ -94,9 +98,9 @@ export class CategoryService {
   }
 
 
-  // =========================================================
+  
   // UPDATE
-  // =========================================================
+  
 
   updateCategory(
     id: number,
@@ -140,9 +144,9 @@ export class CategoryService {
   }
 
 
-  // =========================================================
+  
   // DELETE
-  // =========================================================
+  
 
   deleteCategory(
     id: number

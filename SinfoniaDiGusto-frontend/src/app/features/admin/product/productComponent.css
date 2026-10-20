@@ -1,18 +1,33 @@
+* {
+  box-sizing: border-box;
+}
+
 .products-container {
-  max-width: 1100px;
+  width: 100%;
+  max-width: 1400px;
   margin: 1.5rem auto;
   padding: 0 1rem;
+  min-width: 0;
 }
 
 .header-actions {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
-.header-actions h2 { color: #0f172a; margin-bottom: 0.25rem; }
-.header-actions p { color: #64748b; margin: 0; }
+.header-actions h2 {
+  color: #0f172a;
+  margin: 0 0 0.25rem;
+  overflow-wrap: anywhere;
+}
+
+.header-actions p {
+  color: #64748b;
+  margin: 0;
+}
 
 .btn-create {
   background-color: #8b0000;
@@ -23,24 +38,29 @@
   font-weight: bold;
   cursor: pointer;
   width: 100%;
+  min-height: 44px;
 }
 
-/* CARD FILTRI RESPONSIVE */
+/*
+   FILTRI
+ */
 .filter-card {
   background: white;
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
-  align-items: flex-end;
+  align-items: end;
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .filter-group label {
@@ -51,19 +71,25 @@
   text-transform: uppercase;
 }
 
-.filter-group input, .filter-group select {
-  padding: 0.65rem;
+.filter-group input,
+.filter-group select {
+  width: 100%;
+  min-width: 0;
+  padding: 0.7rem;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
   font-size: 0.9rem;
-  background-color: #ffffff;
+  background-color: #fff;
 }
 
 .btn-reset-wrapper {
-  justify-content: flex-end;
+  display: flex;
+  justify-content: stretch;
 }
 
 .btn-reset {
+  width: 100%;
+  min-height: 44px;
   background-color: #f1f5f9;
   color: #475569;
   border: 1px solid #cbd5e1;
@@ -71,30 +97,50 @@
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.2s;
 }
 
 .btn-reset:hover {
   background-color: #e2e8f0;
 }
 
-/* TABELLA E TABELLA MOBILE */
+/*
+   TABELLA (DESKTOP E TABLET)
+   Larga: se non entra, scorre in orizzontale
+ */
 .table-responsive {
-  background: white;
+  width: 100%;
+  min-width: 0;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  /* Ombre ai bordi: compaiono solo se c'è altro contenuto da scorrere */
+  background:
+    linear-gradient(to right, #fff 30%, rgba(255, 255, 255, 0)),
+    linear-gradient(to right, rgba(255, 255, 255, 0), #fff 70%) 100% 0,
+    radial-gradient(farthest-side at 0 50%, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0)) 100% 0;
+  background-repeat: no-repeat;
+  background-color: #fff;
+  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+  background-attachment: local, local, scroll, scroll;
 }
 
 .data-table {
   width: 100%;
+  min-width: 1000px;
   border-collapse: collapse;
 }
 
-.data-table th, .data-table td {
+.data-table th,
+.data-table td {
   padding: 0.85rem 1rem;
   border-bottom: 1px solid #f1f5f9;
   text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 
 .data-table th {
@@ -104,14 +150,23 @@
   text-transform: uppercase;
 }
 
+/* Colonna "Prodotto": è l'unica che può andare a capo */
+.data-table td:nth-child(2) {
+  white-space: normal;
+  min-width: 260px;
+  max-width: 360px;
+}
+
 .thumb-wrapper {
   width: 48px;
   height: 48px;
+  flex: 0 0 48px;
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1px solid #e2e8f0;
+  overflow: hidden;
 }
 
 .product-thumb {
@@ -124,18 +179,20 @@
 .product-info {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
-.badge-featured {
-  background-color: #fef3c7;
-  color: #d97706;
-  font-size: 0.7rem;
-  padding: 0.15rem 0.4rem;
-  border-radius: 4px;
-  margin-left: 0.3rem;
+/* Descrizione lunga: massimo 2 righe */
+.product-info small {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .badge-sale {
+  display: inline-block;
   background-color: #fee2e2;
   color: #dc2626;
   font-size: 0.75rem;
@@ -147,35 +204,119 @@
 .price-box {
   display: flex;
   flex-direction: column;
+  gap: 0.2rem;
 }
 
-.old-price { color: #94a3b8; font-size: 0.8rem; }
-.text-muted { color: #64748b; font-size: 0.8rem; }
-
-.action-buttons {
-  display: flex;
-  gap: 0.5rem;
+.old-price {
+  color: #94a3b8;
+  font-size: 0.8rem;
 }
 
-.btn-edit, .btn-delete {
-  padding: 0.45rem 0.85rem;
+.text-muted {
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.text-danger {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* Il td delle azioni resta una vera cella di tabella */
+.data-table td.action-buttons {
+  display: table-cell;
+}
+
+.action-buttons button + button {
+  margin-left: 0.5rem;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 0.55rem 0.85rem;
   border-radius: 4px;
   border: none;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
+  min-height: 40px;
 }
 
-.btn-edit { background-color: #e2e8f0; color: #334155; }
-.btn-delete { background-color: #fee2e2; color: #991b1b; }
+.btn-edit {
+  background-color: #e2e8f0;
+  color: #334155;
+}
 
-.empty-cell, .state-message {
+.btn-delete {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.empty-cell,
+.state-message {
   text-align: center;
   color: #64748b;
   padding: 2rem;
 }
 
-/* MODAL */
+/*
+   BADGE
+ */
+.badge-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+}
+
+.badge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badge-inactive {
+  opacity: 0.45;
+}
+
+.badge-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.badge-picker .badge-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 400;
+}
+
+.badge-picker .badge-option.selected {
+  border-color: #8b0000;
+  background-color: #fdf2f2;
+}
+
+.badge-picker .badge-option input {
+  width: auto;
+  min-width: 0;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+/*
+   MODALE
+ */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -185,6 +326,7 @@
   align-items: center;
   z-index: 200;
   padding: 1rem;
+  overflow-y: auto;
 }
 
 .modal-card {
@@ -194,25 +336,26 @@
   padding: 1.5rem;
   border-radius: 8px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  box-sizing: border-box;
-  max-height: 90vh;
+  max-height: calc(100dvh - 2rem);
   overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.error-banner {
+  background-color: #fde8e8;
+  color: #c81e1e;
+  border: 1px solid #f8b4b4;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
 }
 
 .form-group {
   margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.form-row.grid-3 {
-  grid-template-columns: 1fr 1fr 1fr;
+  min-width: 0;
 }
 
 .form-group label {
@@ -222,17 +365,32 @@
   color: #334155;
 }
 
-.form-group input, .form-group select, .form-group textarea {
-  padding: 0.6rem;
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 0.7rem;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 1rem;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
 }
 
 .color-picker-wrapper {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .color-picker-wrapper input[type="color"] {
@@ -243,90 +401,270 @@
   cursor: pointer;
 }
 
-.checkbox-row {
-  display: flex;
-  gap: 1.5rem;
-  margin: 1rem 0;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 600;
+.discount-preview {
+  margin: -0.25rem 0 1rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  background: #fef2f2;
+  color: #991b1b;
   font-size: 0.85rem;
-  cursor: pointer;
 }
 
 .modal-actions {
   display: flex;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 0.75rem;
   margin-top: 1.5rem;
 }
 
-.btn-cancel, .btn-save {
-  padding: 0.65rem 1.1rem;
+.btn-cancel,
+.btn-save {
+  padding: 0.7rem 1.1rem;
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
   border: none;
+  min-height: 44px;
 }
 
-.btn-cancel { background: #e2e8f0; color: #475569; }
-.btn-save { background: #8b0000; color: white; }
+.btn-cancel {
+  background: #e2e8f0;
+  color: #475569;
+}
 
-/* MEDIA QUERIES TABLET & DESKTOP */
+.btn-save {
+  background: #8b0000;
+  color: white;
+}
+
+/*
+   TABLET: DA 640px
+ */
 @media (min-width: 640px) {
   .header-actions {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
   }
-  .btn-create { width: auto; }
+
+  .btn-create {
+    width: auto;
+    flex-shrink: 0;
+  }
 
   .filter-card {
-    grid-template-columns: 2fr 1.5fr 1.5fr auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .btn-reset-wrapper {
+    justify-content: flex-start;
+  }
+
+  .btn-reset {
+    width: auto;
   }
 }
 
-/* TRASFORMAZIONE TABELLA PER MOBILE (< 768px) */
+/*
+   DESKTOP: DA 768px
+ */
+@media (min-width: 768px) {
+  .filter-card {
+    grid-template-columns:
+      minmax(0, 2fr)
+      minmax(0, 1.5fr)
+      minmax(0, 1.5fr)
+      auto;
+  }
+}
+
+/*
+   MOBILE: FINO A 767px
+   Ogni prodotto diventa una card
+ */
 @media (max-width: 767px) {
-  .data-table, .data-table tbody, .data-table tr, .data-table td {
-    display: block;
-    width: 100%;
-    box-sizing: border-box;
+  .products-container {
+    padding: 0 0.75rem;
+    margin: 1rem auto;
   }
 
-  .data-table thead { display: none; }
+  .header-actions h2 {
+    font-size: 1.35rem;
+  }
+
+  .filter-card {
+    padding: 0.85rem;
+  }
+
+  /* Niente scroll orizzontale: le card sono a larghezza piena */
+  .table-responsive {
+    background: none;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .data-table {
+    min-width: 0;
+  }
+
+  .data-table,
+  .data-table tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .data-table thead {
+    display: none;
+  }
 
   .data-table tr {
+    display: block;
+    width: 100%;
     margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
-    padding: 0.75rem 1rem;
-    background: #ffffff;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   }
 
   .data-table td {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 0.6rem 0;
+    align-items: flex-start;
+    gap: 0.75rem;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    padding: 0.7rem 0;
     border-bottom: 1px solid #f1f5f9;
+    text-align: right;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
-
-  .data-table td:last-child { border-bottom: none; }
 
   .data-table td::before {
     content: attr(data-label);
+    flex: 0 0 38%;
     font-weight: 700;
     color: #64748b;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
+    text-align: left;
   }
 
-  .form-row, .form-row.grid-3 {
-    grid-template-columns: 1fr;
+  .data-table td:last-child {
+    border-bottom: none;
+  }
+
+  .data-table td > * {
+    max-width: 62%;
+    min-width: 0;
+  }
+
+  /* Prodotto: etichetta sopra, contenuto a tutta larghezza */
+  .data-table td[data-label="Prodotto"] {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+    text-align: left;
+  }
+
+  .data-table td[data-label="Prodotto"] > * {
+    max-width: 100%;
+  }
+
+  /* Azioni: nessuna etichetta, pulsanti a tutta larghezza */
+  .data-table td.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .data-table td.action-buttons::before {
+    display: none;
+  }
+
+  .data-table td.action-buttons > * {
+    max-width: none;
+  }
+
+  .action-buttons button {
+    flex: 1 1 auto;
+  }
+
+  .action-buttons button + button {
+    margin-left: 0;
+  }
+
+  /* Riga "nessun prodotto" */
+  .data-table td.empty-cell {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .data-table td.empty-cell::before {
+    display: none;
+  }
+
+  /* Modale */
+  .form-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .modal-backdrop {
+    align-items: flex-start;
+    padding: 0.5rem;
+  }
+
+  .modal-card {
+    padding: 1rem;
+    max-height: calc(100dvh - 1rem);
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
+}
+
+/*
+   SMARTPHONE PICCOLI
+ */
+@media (max-width: 380px) {
+  .products-container {
+    padding: 0 0.5rem;
+  }
+
+  .data-table tr {
+    padding: 0.65rem;
+  }
+
+  .data-table td {
+    gap: 0.4rem;
+  }
+
+  .data-table td::before {
+    flex-basis: 34%;
+    font-size: 0.7rem;
+  }
+
+  .data-table td > * {
+    max-width: 66%;
+  }
+
+  .modal-card {
+    padding: 0.85rem;
+  }
+
+  .btn-edit,
+  .btn-delete {
+    padding: 0.5rem;
+    font-size: 0.8rem;
   }
 }

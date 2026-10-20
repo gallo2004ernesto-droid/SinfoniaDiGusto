@@ -15,7 +15,14 @@ import { Login } from './features/public/auth/login/login';
 import { Registrazione } from './features/public/auth/registrazione/registrazione';
 import { ClientManagementComponent } from './features/admin/client/client';
 
-import { adminGuard as AuthGuard} from './core/guard/auth.guard';
+import { adminGuard as AuthAdminGuard} from './core/guard/admin.guard';
+import { authGuard as AuthGuard} from './core/guard/auth.guard';
+import { BadgeAdminComponent } from './features/admin/badge/badgeComponent';
+import { CouponAdminComponent } from './features/admin/coupons/couponsComponent';
+import { SearchResultsComponent } from './features/public/ricerca/ricerca';
+import { SpedizioniComponent } from './features/public/spedizioni/spedizioniComponent';
+import { MetodiPagamentoComponent } from './features/public/metodi-pagamento/metodi-pagamentoComponent';
+import { ChiSiamoComponent } from './features/public/chi-siamo/chi-siamo';
 
 export const routes: Routes = [
     // homepage
@@ -35,15 +42,25 @@ export const routes: Routes = [
     {path: 'auth/login', component: Login},
     {path: 'auth/registrazione', component: Registrazione},
 
+    // informazioni
+    {path: 'spedizioni-consegne', component: SpedizioniComponent},
+    {path: 'pagamenti', component: MetodiPagamentoComponent},
+    {path: 'chi-siamo', component: ChiSiamoComponent},
+
+
     {path: 'i-miei-ordini', component: MyOrdersComponent, canActivate: [AuthGuard]},
 
+    { path: 'cerca', component: SearchResultsComponent },
+
         //Admin
-    {path: 'admin', component:Dashboard, canActivate: [AuthGuard], data: { role: 'ADMIN' }},
-    {path: 'admin/categorie', component: Categories, canActivate: [AuthGuard], data: { role: 'ADMIN' }},
-    {path: 'admin/prodotti', component: ProductAdminComponent, canActivate: [AuthGuard], data: { role: 'ADMIN' }},
-    {path: 'admin/ordini', component: OrderAdmin, canActivate: [AuthGuard], data: { role: 'ADMIN' }},
-    {path: 'admin/clienti', component: ClientManagementComponent, canActivate: [AuthGuard], data: { role: 'ADMIN' }},
-    {path: 'admin/il-mio-profilo', component: AdminProfileComponent, canActivate: [AuthGuard], data: { role: 'ADMIN' }},
+    {path: 'admin', component:Dashboard, canActivate: [AuthAdminGuard], data: { role: 'ADMIN' }},
+    {path: 'admin/categorie', component: Categories, canActivate: [AuthAdminGuard], data: { role: 'ADMIN' }},
+    {path: 'admin/prodotti', component: ProductAdminComponent, canActivate: [AuthAdminGuard], data: { role: 'ADMIN' }},
+    {path: 'admin/ordini', component: OrderAdmin, canActivate: [AuthAdminGuard], data: { role: 'ADMIN' }},
+    {path: 'admin/clienti', component: ClientManagementComponent, canActivate: [AuthAdminGuard], data: { role: 'ADMIN' }},
+    {path: 'admin/badge', component: BadgeAdminComponent, canActivate: [AuthAdminGuard], data: {role: 'ADMIN'}},
+    {path: 'admin/coupon', component: CouponAdminComponent, canActivate: [AuthAdminGuard], data: {role: 'ADMIN'}},
+    {path: 'admin/il-mio-profilo', component: AdminProfileComponent, canActivate: [AuthAdminGuard], data: { role: 'ADMIN' }},
 
     // fallback
     {path: '**', component: HomeComponent}

@@ -1,38 +1,39 @@
 <div class="cart-overlay" [class.active]="isOpen()" (click)="onClose()"></div>
 
-<aside class="cart-drawer" [class.open] = "isOpen()">
+<aside class="cart-drawer" [class.open]="isOpen()">
     <div class="cart-header">
-        <h3>Il tuo carrello </h3>
+        <h3>Il tuo carrello</h3>
         <button class="close-btn" (click)="onClose()" aria-label="Chiudi carrello">
             <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
 
     <div class="cart-body">
-        @if(cartState.cartItems().length === 0){
+        @if (cartState.cartItems().length === 0) {
             <div class="empty-cart">
-                <i class="fa-solid da-basket-shopping"></i>
+                <i class="fa-solid fa-basket-shopping"></i>
                 <p>Il carrello è vuoto</p>
             </div>
-        }@else {
+        } @else {
             <div class="cart-items">
-                @for(item of cartState.cartItems(); track item.product.id){
+                @for (item of cartState.cartItems(); track item.product.id) {
                     <div class="cart-item">
-                        <img [src] = "item.product.imageUrl" [alt] = "item.product.name" class="item-img">
-                    </div>
-                    <div class="item-details">
-                        <span class="item-name">{{ item.product.name }}</span>
-                        <span class="item-price">{{ item.product.price | currency:'EUR': 'symbol': '1.2-2'}}</span>
-                        <div class="quantity-controls">
-                            <button (click)="cartState.updateQuantity(item.product.id, item.quantity - 1)">-</button>
-                            <span>{{ item.quantity }}</span>
-                            <button (click)="cartState.updateQuantity(item.product.id, item.quantity + 1)">+</button>
-                        </div>
-                    </div>
+                        <img [src]="getImageUrl(item.product.imageUrl)" [alt]="item.product.name" class="item-img">
 
-                    <button class="remove-btn" (click)="cartState.removeItem(item.product.id)" aria-label="Rimuovi prodotto">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
+                        <div class="item-details">
+                            <span class="item-name">{{ item.product.name }}</span>
+                            <span class="item-price">{{ item.product.price | currency:'EUR':'symbol':'1.2-2' }}</span>
+                            <div class="quantity-controls">
+                                <button (click)="cartState.updateQuantity(item.product.id, item.quantity - 1)" aria-label="Diminuisci quantità">-</button>
+                                <span>{{ item.quantity }}</span>
+                                <button (click)="cartState.updateQuantity(item.product.id, item.quantity + 1)" aria-label="Aumenta quantità">+</button>
+                            </div>
+                        </div>
+
+                        <button class="remove-btn" (click)="cartState.removeItem(item.product.id)" aria-label="Rimuovi prodotto">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
                 }
             </div>
         }
@@ -41,7 +42,7 @@
     <div class="cart-footer">
         <div class="summary-row">
             <span>Totale:</span>
-            <span class="total-price">{{ cartState.totalPrice()| currency:'EUR': 'symbol': '1.2-2'}}</span>
+            <span class="total-price">{{ cartState.totalPrice() | currency:'EUR':'symbol':'1.2-2' }}</span>
         </div>
 
         <button

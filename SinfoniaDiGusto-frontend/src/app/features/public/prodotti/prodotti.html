@@ -51,15 +51,15 @@
         <i class="fa-solid fa-circle-notch fa-spin"></i>
         <span>Caricamento prodotti in corso...</span>
       </div>
-    } @else if (productState.products().length === 0) {
+    } @else if (productState.filteredProducts().length === 0) {
       <div class="empty-state">
         <i class="fa-solid fa-cookie-bite"></i>
         <p>Nessun dolce trovato per la categoria {{ currentCategory().name }}.</p>
-        <a routerLink="/categorie" class="reset-link">Mostra tutti i prodotti</a>
+        <a routerLink="/prodotti" class="reset-link">Mostra tutti i prodotti</a>
       </div>
     } @else {
       <div class="products-grid">
-        @for (product of productState.products(); track product.id) {
+        @for (product of productState.filteredProducts(); track product.id) {
           <app-product-card [product]="product"></app-product-card>
         }
       </div>

@@ -2,10 +2,8 @@
 
 <div class="categories-container">
 
-  <!-- ===================================================== -->
   <!-- HEADER -->
-  <!-- ===================================================== -->
-
+  
   <div class="header-actions">
 
     <div>
@@ -24,11 +22,7 @@
 
     </div>
 
-    <button
-      class="btn-create"
-      type="button"
-      (click)="openCreateModal()"
-    >
+    <button class="btn-create" type="button" (click)="openCreateModal()">
 
       <i class="fa-solid fa-plus"></i>
 
@@ -39,429 +33,373 @@
   </div>
 
 
-  <!-- ===================================================== -->
+  
   <!-- CARICAMENTO -->
-  <!-- ===================================================== -->
-
+  
   @if (isLoading()) {
 
-    <div class="state-message">
+  <div class="state-message">
 
-      <i class="fa-solid fa-spinner fa-spin"></i>
+    <i class="fa-solid fa-spinner fa-spin"></i>
 
-      Caricamento categorie...
+    Caricamento categorie...
 
-    </div>
+  </div>
 
   } @else {
 
-    <!-- =================================================== -->
-    <!-- TABELLA -->
-    <!-- =================================================== -->
+  
+  <!-- TABELLA -->
+  
 
-    <div class="table-responsive">
+  <div class="table-responsive">
 
-      <table class="data-table">
+    @if (errorMessage()) {
+    <div class="error-banner">{{ errorMessage() }}</div>
+    }
 
-        <thead>
+    <table class="data-table">
 
-          <tr>
+      <thead>
 
-            <th>
+        <tr>
 
-              <i class="fa-solid fa-image"></i>
+          <th>
 
-              Immagine
+            <i class="fa-solid fa-image"></i>
 
-            </th>
+            Immagine
 
-            <th>
+          </th>
+
+          <th>
+
+            <i class="fa-solid fa-tag"></i>
+
+            Nome Categoria
+
+          </th>
+
+          <th>
+
+            <i class="fa-solid fa-box"></i>
+
+            Prodotti
+
+          </th>
+
+          <th>
+
+            <i class="fa-solid fa-gear"></i>
+
+            Azioni
+
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        @for (
+        category of categories();
+        track category.id
+        ) {
+
+        <tr>
+
+          
+          <!-- IMMAGINE -->
+          
+
+          <td data-label="Immagine">
+
+            @if (category.imgeUrl) {
+
+            <img [src]="getImageUrl(category.imgeUrl)" [alt]="category.name" class="category-thumb" />
+
+            } @else {
+
+            <div class="no-thumb">
 
               <i class="fa-solid fa-tag"></i>
 
-              Nome Categoria
+            </div>
 
-            </th>
+            }
 
-            <th>
-
-              <i class="fa-solid fa-box"></i>
-
-              Prodotti
-
-            </th>
-
-            <th>
-
-              <i class="fa-solid fa-gear"></i>
-
-              Azioni
-
-            </th>
-
-          </tr>
-
-        </thead>
+          </td>
 
 
-        <tbody>
+          
+          <!-- NOME -->
+          
 
-          @for (
-            category of categories();
-            track category.id
-          ) {
+          <td>
 
-            <tr>
+            <strong data-label="Nome">
+              {{ category.name }}
+            </strong>
 
-              <!-- ========================================= -->
-              <!-- IMMAGINE -->
-              <!-- ========================================= -->
-
-              <td>
-
-                @if (category.imageUrl) {
-
-                  <img
-                    [src]="getImageUrl(category.imageUrl)"
-                    [alt]="category.name"
-                    class="category-thumb"
-                  />
-
-                } @else {
-
-                  <div class="no-thumb">
-
-                    <i class="fa-solid fa-tag"></i>
-
-                  </div>
-
-                }
-
-              </td>
+          </td>
 
 
-              <!-- ========================================= -->
-              <!-- NOME -->
-              <!-- ========================================= -->
+          
+          <!-- PRODOTTI -->
+          
 
-              <td>
+          <td data-label="Azioni">
 
-                <strong>
-                  {{ category.name }}
-                </strong>
+            <i class="fa-solid fa-box-open"></i>
 
-              </td>
+            {{ category.productCount }}
 
+            prodotti
 
-              <!-- ========================================= -->
-              <!-- PRODOTTI -->
-              <!-- ========================================= -->
-
-              <td>
-
-                <i class="fa-solid fa-box-open"></i>
-
-                {{ category.productCount ?? 0 }}
-
-                prodotti
-
-              </td>
+          </td>
 
 
-              <!-- ========================================= -->
-              <!-- AZIONI -->
-              <!-- ========================================= -->
+          
+          <!-- AZIONI -->
+          
 
-              <td class="action-buttons">
+          <td class="action-buttons">
 
-                <button
-                  class="btn-edit"
-                  type="button"
-                  (click)="openEditModal(category)"
-                  title="Modifica categoria"
-                >
+            <button class="btn-edit" type="button" (click)="openEditModal(category)" title="Modifica categoria">
 
-                  <i class="fa-solid fa-pen-to-square"></i>
+              <i class="fa-solid fa-pen-to-square"></i>
 
-                  Modifica
+              Modifica
 
-                </button>
+            </button>
 
 
-                <button
-                  class="btn-delete"
-                  type="button"
-                  (click)="deleteCategory(category.id!)"
-                  title="Elimina categoria"
-                >
+            <button class="btn-delete" (click)="deleteCategory(category.id!)" [disabled]="category.productCount > 0"
+              [title]="category.productCount > 0 ? 'Rimuovi prima i prodotti' : 'Elimina'">
+              <i class="fa-solid fa-trash"></i>
+              Elimina
+            </button>
 
-                  <i class="fa-solid fa-trash"></i>
+          </td>
 
-                  Elimina
+        </tr>
 
-                </button>
+        } @empty {
 
-              </td>
+        <tr>
 
-            </tr>
+          <td colspan="4" class="empty-cell">
 
-          } @empty {
+            <i class="fa-solid fa-folder-open"></i>
 
-            <tr>
+            <span>
+              Nessuna categoria creata.
+            </span>
 
-              <td
-                colspan="4"
-                class="empty-cell"
-              >
+          </td>
 
-                <i class="fa-solid fa-folder-open"></i>
+        </tr>
 
-                <span>
-                  Nessuna categoria creata.
-                </span>
+        }
 
-              </td>
+      </tbody>
 
-            </tr>
+    </table>
 
-          }
-
-        </tbody>
-
-      </table>
-
-    </div>
+  </div>
 
   }
 
 
-  <!-- ===================================================== -->
+  
   <!-- MODALE -->
-  <!-- ===================================================== -->
+  
 
   @if (showModal) {
 
-    <div
-      class="modal-backdrop"
-      (click)="closeModal()"
-    >
+  <div class="modal-backdrop" (click)="closeModal()">
 
-      <div
-        class="modal-card"
-        (click)="$event.stopPropagation()"
-      >
+    <div class="modal-card" (click)="$event.stopPropagation()">
 
-        <!-- =============================================== -->
-        <!-- TITOLO -->
-        <!-- =============================================== -->
+      
+      <!-- TITOLO -->
+      
 
-        <h3>
+      <h3>
 
-          <i
-            class="fa-solid"
-            [ngClass]="
+        <i class="fa-solid" [ngClass]="
               editingCategory
                 ? 'fa-pen-to-square'
                 : 'fa-plus-circle'
-            "
-          >
-          </i>
+            ">
+        </i>
 
-          {{
-            editingCategory
-              ? 'Modifica Categoria'
-              : 'Nuova Categoria'
-          }}
+        {{
+        editingCategory
+        ? 'Modifica Categoria'
+        : 'Nuova Categoria'
+        }}
 
-        </h3>
-
-
-        <!-- =============================================== -->
-        <!-- FORM -->
-        <!-- =============================================== -->
-
-        <form
-          [formGroup]="categoryForm"
-          (ngSubmit)="onSubmit()"
-        >
-
-          <!-- ============================================= -->
-          <!-- NOME -->
-          <!-- ============================================= -->
-
-          <div class="form-group">
-
-            <label for="name">
-
-              <i class="fa-solid fa-tag"></i>
-
-              Nome Categoria
-
-            </label>
-
-            <input
-              id="name"
-              type="text"
-              formControlName="name"
-              placeholder="Es. Torte artigianali"
-            />
+      </h3>
 
 
-            @if (
-              categoryForm.controls.name.touched &&
-              categoryForm.controls.name.errors?.['required']
-            ) {
+      
+      <!-- FORM -->
+      
 
-              <small class="error-text">
+      <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
 
-                <i
-                  class="fa-solid fa-circle-exclamation"
-                ></i>
+       
+        <!-- NOME -->
+       
 
-                Il nome è obbligatorio.
+        <div class="form-group">
 
-              </small>
+          <label for="name">
 
-            }
+            <i class="fa-solid fa-tag"></i>
 
-          </div>
+            Nome Categoria
 
+          </label>
 
-          <!-- ============================================= -->
-          <!-- IMMAGINE -->
-          <!-- ============================================= -->
+          <input id="name" type="text" formControlName="name" placeholder="Es. Torte artigianali" />
 
-          <div class="form-group">
-
-            <label for="image">
-
-              <i class="fa-solid fa-image"></i>
-
-              Immagine Categoria
-
-            </label>
-
-            <input
-              id="image"
-              type="file"
-              accept="image/*"
-              (change)="onImageSelected($event)"
-            />
-
-
-            @if (selectedImageFile) {
-
-              <small class="text-muted">
-
-                File selezionato:
-
-                {{ selectedImageFile.name }}
-
-              </small>
-
-            } @else if (editingCategory?.imageUrl) {
-
-              <small class="text-muted">
-
-                Lascia vuoto per mantenere
-                l'immagine attuale.
-
-              </small>
-
-            } @else {
-
-              <small class="text-muted">
-
-                Seleziona un'immagine dal computer.
-
-              </small>
-
-            }
-
-          </div>
-
-
-          <!-- ============================================= -->
-          <!-- ANTEPRIMA -->
-          <!-- ============================================= -->
 
           @if (
-            editingCategory?.imageUrl &&
-            !selectedImageFile
+          categoryForm.controls.name.touched &&
+          categoryForm.controls.name.errors?.['required']
           ) {
 
-            <div class="form-group">
+          <small class="error-text">
 
-              <label>
-                Immagine attuale
-              </label>
+            <i class="fa-solid fa-circle-exclamation"></i>
 
-              <img
-                [src]="getImageUrl(editingCategory?.imageUrl)"
-                [alt]="editingCategory?.name"
-                class="category-preview"
-              />
+            Il nome è obbligatorio.
 
-            </div>
+          </small>
 
           }
 
-
-          <!-- ============================================= -->
-          <!-- AZIONI -->
-          <!-- ============================================= -->
-
-          <div class="modal-actions">
-
-            <button
-              type="button"
-              class="btn-cancel"
-              (click)="closeModal()"
-            >
-
-              <i class="fa-solid fa-xmark"></i>
-
-              Annulla
-
-            </button>
+        </div>
 
 
-            <button
-              type="submit"
-              class="btn-save"
-              [disabled]="
+       
+        <!-- IMMAGINE -->
+       
+
+        <div class="form-group">
+
+          <label for="image">
+
+            <i class="fa-solid fa-image"></i>
+
+            Immagine Categoria
+
+          </label>
+
+          <input id="image" type="file" accept="image/*" (change)="onImageSelected($event)" />
+
+
+          @if (selectedImageFile) {
+
+          <small class="text-muted">
+
+            File selezionato:
+
+            {{ selectedImageFile.name }}
+
+          </small>
+
+          } @else if (editingCategory?.imgeUrl) {
+
+          <small class="text-muted">
+
+            Lascia vuoto per mantenere
+            l'immagine attuale.
+
+          </small>
+
+          } @else {
+
+          <small class="text-muted">
+
+            Seleziona un'immagine dal computer.
+
+          </small>
+
+          }
+
+        </div>
+
+
+       
+        <!-- ANTEPRIMA -->
+       
+
+        @if (
+        editingCategory?.imgeUrl &&
+        !selectedImageFile
+        ) {
+
+        <div class="form-group">
+
+          <label>
+            Immagine attuale
+          </label>
+
+          <img [src]="getImageUrl(editingCategory?.imgeUrl)" [alt]="editingCategory?.name" class="category-preview" />
+
+        </div>
+
+        }
+
+
+       
+        <!-- AZIONI -->
+       
+
+        <div class="modal-actions">
+
+          <button type="button" class="btn-cancel" (click)="closeModal()">
+
+            <i class="fa-solid fa-xmark"></i>
+
+            Annulla
+
+          </button>
+
+
+          <button type="submit" class="btn-save" [disabled]="
                 categoryForm.invalid ||
                 isSaving()
-              "
-            >
+              ">
 
-              @if (isSaving()) {
+            @if (isSaving()) {
 
-                <i
-                  class="fa-solid fa-spinner fa-spin"
-                ></i>
+            <i class="fa-solid fa-spinner fa-spin"></i>
 
-                Salvataggio...
+            Salvataggio...
 
-              } @else {
+            } @else {
 
-                <i
-                  class="fa-solid fa-floppy-disk"
-                ></i>
+            <i class="fa-solid fa-floppy-disk"></i>
 
-                Salva
+            Salva
 
-              }
+            }
 
-            </button>
+          </button>
 
-          </div>
+        </div>
 
-        </form>
-
-      </div>
+      </form>
 
     </div>
+
+  </div>
 
   }
 

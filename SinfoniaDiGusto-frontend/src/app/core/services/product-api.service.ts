@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../model/product.model';
 
@@ -20,5 +20,10 @@ export class ProductApiService {
 
   getProductsByCategory(categoryId: number): Observable<Product[]> {
     return this.http.get<Product[]>(`${this.apiUrl}/category/${categoryId}`);
+  }
+
+  searchProducts(query: string): Observable<Product[]> {
+    const params = new HttpParams().set('query', query);
+    return this.http.get<Product[]>(`${this.apiUrl}/search`, { params });
   }
 }

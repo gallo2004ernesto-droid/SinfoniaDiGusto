@@ -8,7 +8,7 @@
       <p>Gestisci catalogo, prezzi, offerte e schede tecniche PDF</p>
     </div>
 
-    <button class="btn-create" (click)="openCreateModal()">
+    <button class="btn-create" type="button" (click)="openCreateModal()">
       Nuovo Prodotto
     </button>
   </div>
@@ -105,20 +105,23 @@
 
             <div class="product-info">
 
-              <strong>
-                {{ product.name }}
-
-                @if (product.featured) {
-                <span class="badge-featured">
-                  In Evidenza
-                </span>
-                }
-
-              </strong>
+              <strong>{{ product.name }}</strong>
 
               <small class="text-muted">
                 {{ product.description }}
               </small>
+
+              <!-- BADGE ASSEGNATI -->
+              @if (product.badges?.length) {
+              <div class="badge-list">
+                @for (b of product.badges; track b.id) {
+                <span class="badge-chip" [class.badge-inactive]="!b.is_active" [style.backgroundColor]="b.background_color"
+                  [style.color]="b.text_color">
+                  {{ b.icon }} {{ b.name }}
+                </span>
+                }
+              </div>
+              }
 
             </div>
 
@@ -126,7 +129,7 @@
 
           <!-- CATEGORIA -->
           <td data-label="Categoria">
-            {{ product.category }}
+            {{ product.categoryName }}
           </td>
 
           <!-- PREZZO -->
@@ -169,6 +172,7 @@
 
           </td>
 
+          <!-- STOCK -->
           <td data-label="Stock">
             <span [class.text-danger]="product.stockQuantity === 0">
               {{ product.stockQuantity ?? 0 }} pz
@@ -194,7 +198,7 @@
 
         <tr>
 
-          <td colspan="6" class="empty-cell">
+          <td colspan="7" class="empty-cell">
             Nessun prodotto corrisponde ai filtri selezionati.
           </td>
 
@@ -225,6 +229,10 @@
         }}
       </h3>
 
+      @if (formError()) {
+      <div class="error-banner">{{ formError() }}</div>
+      }
+
       <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
 
         <!-- NOME -->
@@ -243,7 +251,7 @@
 
           <div class="form-group">
 
-            <label for="category">
+            <label for="categoryId">
               Categoria *
             </label>
 
@@ -285,8 +293,47 @@
 
         </div>
 
+        <!-- BADGE -->
+        <div class="form-group">
+
+          <label>Badge</label>
+
+          @if (badges().length === 0) {
+
+          <small class="text-muted">
+            Nessun badge disponibile. Creane uno dalla sezione Badge.
+          </small>
+
+          } @else {
+
+          <div class="badge-picker">
+
+            @for (badge of badges(); track badge.id) {
+
+            <label class="badge-option" [class.selected]="isBadgeSelected(badge.id!)">
+
+              <input type="checkbox" [checked]="isBadgeSelected(badge.id!)" (change)="toggleBadge(badge.id!)" />
+
+              <span class="badge-chip" [style.backgroundColor]="badge.background_color" [style.color]="badge.text_color">
+                {{ badge.icon }} {{ badge.name }}
+              </span>
+
+              @if (!badge.is_active) {
+              <small class="text-muted">(disattivato)</small>
+              }
+
+            </label>
+
+            }
+
+          </div>
+
+          }
+
+        </div>
+
         <!-- PREZZI -->
-        <div class="form-row grid-3">
+        <div class="form-row">
 
           <div class="form-group">
 
@@ -298,57 +345,70 @@
 
           </div>
 
+          @if (isOfferSelected()) {
+
           <div class="form-group">
 
             <label for="originalPrice">
-              Prezzo Orig. (€)
+              Prezzo originale (€) *
             </label>
 
             <input id="originalPrice" type="number" step="0.01" formControlName="originalPrice" placeholder="0.00" />
 
           </div>
 
-          <div class="form-group">
-
-            <label for="discountPercent">
-              Sconto (%)
-            </label>
-
-            <input id="discountPercent" type="number" formControlName="discountPercent" placeholder="Es. 20" />
-
-          </div>
+          }
 
         </div>
+
+        @if (isOfferSelected()) {
+
+        <div class="discount-preview">
+
+          @if (discountPreview !== null) {
+          Sconto calcolato: <strong>-{{ discountPreview }}%</strong>
+          } @else {
+          Inserisci un Prezzo originale maggiore del Prezzo per calcolare lo sconto.
+          }
+
+        </div>
+
+        }
+
+        <!-- STOCK -->
         <div class="form-group">
-          <div class="form-group">
-            <label for="stockQuantity">Quantità Stock *</label>
-            <input id="stockQuantity" type="number" min="0" formControlName="stockQuantity" placeholder="0" />
-          </div>
+
+          <label for="stockQuantity">
+            Quantità Stock *
+          </label>
+
+          <input id="stockQuantity" type="number" min="0" formControlName="stockQuantity" placeholder="0" />
+
         </div>
 
-
+        <!-- IMMAGINE -->
         <div class="form-group">
 
           <label for="imageUrl">
             Immagine file *
           </label>
-          <input id="imageUrl" type="file" accept="image/*" (change)="onImageSelected($event)" />
 
+          <input id="imageUrl" type="file" accept="image/*" (change)="onImageSelected($event)" />
 
         </div>
 
-
+        <!-- PDF -->
         <div class="form-group">
 
-          <label for="pdfUrl">
-            URL Scheda Tecnica (PDF)
+          <label for="pdfFile">
+            Scheda Tecnica (PDF)
           </label>
 
           <input id="pdfFile" type="file" accept="application/pdf" (change)="onPdfSelected($event)" />
 
         </div>
 
-
+        <!-- DESCRIZIONE -->
         <div class="form-group">
 
           <label for="description">
@@ -360,26 +420,7 @@
 
         </div>
 
-        <div class="checkbox-row">
-
-          <label class="checkbox-label">
-
-            <input type="checkbox" formControlName="isOffer" />
-
-            In Offerta
-
-          </label>
-
-          <label class="checkbox-label">
-
-            <input type="checkbox" formControlName="featured" />
-
-            In Evidenza
-
-          </label>
-
-        </div>
-
+        <!-- AZIONI -->
         <div class="modal-actions">
 
           <button type="button" class="btn-cancel" (click)="closeModal()">

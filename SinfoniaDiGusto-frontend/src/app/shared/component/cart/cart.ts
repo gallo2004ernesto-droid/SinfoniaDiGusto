@@ -22,4 +22,11 @@ export class Cart {
   onClose(): void{
     this.closeCart.emit();
   }
+
+   getImageUrl(path?: string): string {
+    if (!path) return 'assets/images/placeholder.jpg';
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    const baseUrl = 'http://localhost:8080';
+    return path.startsWith('/') ? `${baseUrl}${path}` : `${baseUrl}/${path}`;
+  }
 }

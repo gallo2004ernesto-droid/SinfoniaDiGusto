@@ -18,9 +18,9 @@ export class AdminStatsService {
     });
   }
 
-  /**
-   * Chiamata HTTP GET al backend per le statistiche della dashboard
-   */
+  /*
+    Chiamata HTTP GET al backend per le statistiche della dashboard
+  */
   getStats(): Observable<DashboardStats> {
     return this.http.get<DashboardStats>(this.apiUrl,{
       headers: this.getAuthHeaders()

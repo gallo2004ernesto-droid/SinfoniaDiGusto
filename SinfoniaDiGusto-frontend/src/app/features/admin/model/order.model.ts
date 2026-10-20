@@ -1,18 +1,32 @@
-export type OrderStatus = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+export type OrderStatus = 'PENDING' | 'PAID' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
 
 export interface OrderItem {
   id: number;
+  productId: number;
   productName: string;
+  productImageUrl?: string | null;
   quantity: number;
   price: number;
 }
 
 export interface Order {
   id: number;
-  customerName: string;
-  customerEmail: string;
-  totalAmount: number;
+  userId: number;
+  userEmail: string;
+  orderDate: string;
   status: OrderStatus;
-  createdAt: string;
+  totalAmount: number;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  notes?: string | null;
+  paymentMethod: string;
   items: OrderItem[];
+  couponCode?: string | null;
+  discountAmount?: number;
+  subtotal?: number;
+  shippingCost?: number | null;
 }

@@ -1,86 +1,247 @@
 <div class="announcement-bar">
-    <span>🍪 Scopri le nostre delizie artigianali — Ordina ora</span>
+  <span>🍪 Scopri le nostre delizie artigianali — Ordina ora</span>
 </div>
 
 <header class="main-header">
-    <div class="header-container">
-        <button class="icon-btn" aria-label="Apri menu">
-            <i class="fa-solid fa-bars"></i>
-        </button>
-        <button class="icon-btn" aria-label="Cerca">
-            <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
+
+  <!-- Sinistra: menu (solo mobile) e ricerca -->
+  <div class="header-container">
+    <button type="button" class="icon-btn hamburger" (click)="toggleMenu()" aria-label="Apri menu"
+      aria-controls="main-nav" [attr.aria-expanded]="menuOpen()">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <button type="button" class="icon-btn" aria-label="Cerca" (click)="openSearch()">
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </button>
+  </div>
+
+  <!-- Logo -->
+  <a class="brand-logo" routerLink="/" aria-label="Sinfonia Di Gusto - Home">
+    <span class="logo">
+      <span class="start-end">Sinfonia</span>
+      <span class="center">Di</span>
+      <span class="start-end">Gusto</span>
+    </span>
+  </a>
+
+  <!-- Account e carrello -->
+  <div class="header-actions right">
+
+    @if (isLoggedIn()) {
+
+    <!-- Utente loggato: avatar con menu a comparsa -->
+    <div class="account-menu" [class.open]="accountMenuOpen">
+
+      <button type="button" class="icon-btn account-btn" (click)="toggleAccountMenu()" aria-label="Menu account"
+        aria-haspopup="true" [attr.aria-expanded]="accountMenuOpen">
+
+        @if (userInitial()) {
+        <span class="avatar">{{ userInitial() }}</span>
+        } @else {
+        <span class="avatar"><i class="fa-solid fa-user"></i></span>
+        }
+      </button>
+
+      <div class="account-dropdown">
+        <div class="account-card">
+
+          <div class="account-user">
+            <small>Ciao,</small>
+            <strong>{{ userName() || 'Benvenuto' }}</strong>
+          </div>
+
+          <a routerLink="/i-miei-ordini" (click)="closeAccountMenu()">
+            <i class="fa-solid fa-box-open"></i>
+            I miei ordini
+          </a>
+
+          @if (isAdmin()) {
+          <a routerLink="/admin" (click)="closeAccountMenu()">
+            <i class="fa-solid fa-gauge"></i>
+            Pannello admin
+          </a>
+          }
+
+          <button type="button" class="logout-btn" (click)="onLogout()">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Esci
+          </button>
+
+        </div>
+      </div>
+
     </div>
 
-    <!-- LOGO  -->
-    <div class="brand-logo" routerLink="/">
-        <h1 class="logo">
-            <span class="start-end">Sinfonia </span><span class="center"> Di </span><span class="start-end">Gusto</span>
-        </h1>
-    </div>
+    } @else {
 
-    <!-- Account e Carrello -->
-    <div class="header-actions right">
-        <a [routerLink]="['/auth','login']" class="icon-btn" aria-label="Account">
-            <i class="fa-regular fa-user"></i>
-        </a>
-        <button class="icon-btn cart-btn" (click) = "onOpenCart()" aria-label="Apri Carrello">
-            <i class="fa-solid fa-bag-shopping"></i>
-            @if(cartCount() > 0){
-                <span class="cart-badge">{{ cartCount() }}</span>
-            }
-        </button>
-    </div>
+    <!-- Non loggato: link al login -->
+    <a [routerLink]="['/auth','login']" class="icon-btn" aria-label="Accedi">
+      <i class="fa-regular fa-user"></i>
+    </a>
+
+    }
+
+    <button type="button" class="icon-btn cart-btn" (click)="onOpenCart()" aria-label="Apri carrello">
+      <i class="fa-solid fa-bag-shopping"></i>
+      @if (cartCount() > 0) {
+      <span class="cart-badge">{{ cartCount() }}</span>
+      }
+    </button>
+
+  </div>
 </header>
 
-<!-- main menu -->
+<!-- Sfondo scuro dietro il menu mobile -->
+<div class="nav-backdrop" [class.show]="menuOpen()" (click)="closeMenu()"></div>
 
-<nav class="main-nav">
+<!-- Menu principale: barra su desktop, pannello laterale su mobile -->
+<nav id="main-nav" class="main-nav" [class.open]="menuOpen()" aria-label="Menu principale" (click)="onNavClick($event)">
+
+  <div class="drawer-header">
+    <span class="drawer-title">Menu</span>
+
+    <button type="button" class="drawer-close" (click)="closeMenu()" aria-label="Chiudi menu">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
   <ul class="nav-links">
+
     <li>
-      <a routerLink="/" routerLinkActive="active"
-         [routerLinkActiveOptions]="{exact: true}">
+      <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         Home
       </a>
     </li>
 
-    <li class="dropdown">
-      <a routerLink="/prodotti">Prodotti</a>
+    <li class="dropdown" [class.open]="openSection() === 'products'">
+      <div class="nav-row">
+        <a class="nav-link" routerLink="/prodotti" routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }">Prodotti</a>
+
+        <button type="button" class="submenu-toggle" (click)="toggleSection('products')"
+          [attr.aria-expanded]="openSection() === 'products'" aria-label="Mostra le categorie">
+          <i class="fa-solid fa-chevron-down"></i>
+        </button>
+      </div>
+
       <ul class="dropdown-menu">
         @for (cat of categories(); track cat.id) {
-          <li>
-            <a [routerLink]="['/prodotti',cat.name.toLowerCase()]">
-              {{ cat.name}}
-            </a>
-          </li>
+        <li>
+          <a [routerLink]="['/prodotti', cat.name.toLowerCase()]">
+            {{ cat.name }}
+          </a>
+        </li>
         } @empty {
-          <li><a routerLink="/prodotti">Tutti i prodotti</a></li>
+        <li><a routerLink="/prodotti">Tutti i prodotti</a></li>
         }
-        <!-- <li><a routerLink="/prodotti/torte">Torte</a></li>
-        <li><a routerLink="/prodotti/biscotti">Biscotti</a></li>
-        <li><a routerLink="/prodotti/crostate" >Crostate</a></li>
-        <li><a routerLink="/prodotti/cornetti" >Cornetti</a></li>
-        <li><a routerLink="/prodotti/dessert" >Dessert</a></li> -->
       </ul>
     </li>
 
-    <li class="dropdown">
-      <a href="#">Servizi clienti</a>
+    <li class="dropdown" [class.open]="openSection() === 'services'">
+      <div class="nav-row">
+        <button type="button" class="nav-link nav-trigger" (click)="toggleSection('services')"
+          [attr.aria-expanded]="openSection() === 'services'">
+          Servizi clienti
+          <i class="fa-solid fa-chevron-down nav-caret"></i>
+        </button>
+      </div>
+
       <ul class="dropdown-menu">
-        <li><a routerLink="/contatti">Contatti</a></li>
-        <li><a routerLink="/faq">FAQ</a></li>
         <li><a routerLink="/spedizioni-consegne">Spedizioni e consegne</a></li>
         <li><a routerLink="/pagamenti">Pagamenti</a></li>
       </ul>
     </li>
 
     <li>
-      <a routerLink="/chi-siamo">Chi siamo</a>
+      <a class="nav-link" routerLink="/chi-siamo" routerLinkActive="active">Chi siamo</a>
     </li>
 
     <li>
-        <a [routerLink]="['/prodotti/offerte']"> Promozioni</a>
+      <a class="nav-link" [routerLink]="['/prodotti/offerte']" routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }">Promozioni</a>
     </li>
+
   </ul>
 </nav>
 
+<!-- RICERCA -->
+@if (searchOpen()) {
+<div class="search-overlay" (click)="closeSearch()">
+
+  <div class="search-panel" role="dialog" aria-modal="true" aria-label="Cerca nel catalogo"
+    (click)="$event.stopPropagation()">
+
+    <form class="search-form" (submit)="onSearchSubmit($event)">
+      <i class="fa-solid fa-magnifying-glass"></i>
+
+      <input #searchInput type="search" placeholder="Cerca torte, biscotti, dessert..." autocomplete="off"
+        [value]="searchTerm()" (input)="onSearchInput($any($event.target).value)" />
+
+      <button type="button" class="search-close" (click)="closeSearch()" aria-label="Chiudi ricerca">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </form>
+
+    <div class="search-results">
+
+      @if (isSearching()) {
+
+      <div class="search-hint">
+        <i class="fa-solid fa-circle-notch fa-spin"></i> Ricerca in corso...
+      </div>
+
+      } @else if (suggestions().length > 0) {
+
+      <ul>
+        @for (product of suggestions(); track product.id) {
+        <li>
+          <button type="button" class="suggestion" (click)="goToProduct(product)">
+
+            @if (product.imageUrl) {
+            <img [src]="getImageUrl(product.imageUrl)" [alt]="product.name" />
+            } @else {
+            <span class="no-img"></span>
+            }
+
+            <span class="suggestion-info">
+              <span class="suggestion-name">{{ product.name }}</span>
+              <span class="suggestion-category">{{ product.categoryName }}</span>
+            </span>
+
+            <span class="suggestion-price">
+              @if (product.isOffer && product.originalPrice) {
+              <del class="old">{{ product.originalPrice | currency:'EUR':'symbol':'1.2-2' }}</del>
+              }
+              {{ product.price | currency:'EUR':'symbol':'1.2-2' }}
+            </span>
+
+          </button>
+        </li>
+        }
+      </ul>
+
+      <button type="button" class="search-all" (click)="onSearchSubmit()">
+        Vedi tutti i risultati per «{{ searchTerm().trim() }}»
+      </button>
+
+      } @else if (searchTerm().trim().length >= 2) {
+
+      <div class="search-hint">
+        Nessun prodotto trovato per «{{ searchTerm().trim() }}»
+      </div>
+
+      } @else {
+
+      <div class="search-hint">
+        Scrivi almeno 2 lettere per cercare.
+      </div>
+
+      }
+
+    </div>
+
+  </div>
+
+</div>
+}

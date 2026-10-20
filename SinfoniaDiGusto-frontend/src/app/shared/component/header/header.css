@@ -1,183 +1,719 @@
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
 
-/* Barra degli annunci */
+/*
+  L'host non crea un blocco proprio: così l'header può restare fisso in alto
+  rispetto a tutta la pagina. Per disattivare l'header fisso, togli
+  "position: sticky" e "top: 0" da .main-header.
+*/
+:host {
+  display: contents;
+}
+
+/*
+   BARRA ANNUNCI
+ */
 .announcement-bar {
   background-color: var(--announcement-bg);
   color: var(--text-muted);
   text-align: center;
   padding: 8px 16px;
-  font-size: 0.85rem;
+  font-size: clamp(0.72rem, 2.8vw, 0.85rem);
   font-weight: 500;
+  line-height: 1.35;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Header Principale */
+/*
+   HEADER PRINCIPALE
+ */
 .main-header {
-  background: #ffffff;
-  padding: 15px 40px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+  padding: clamp(15px, 3vw, 40px) clamp(12px, 3vw, 40px);
+  background: #ffffff;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-  position: relative;
-  z-index: 100;
 }
 
-.main-header .header-container {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  flex: 1;
-}
-
-.main-header .brand-logo {
-  text-align: center;
-  cursor: pointer;
-  flex: 2;
-}
-
-
-
-
-.logo{
-  font-family: "Pacifico", cursive !important;
-  font-weight: 400;
-  font-style: normal;
-  font-size: 48px; 
-  text-transform: none !important;
-}
-
-.start-end {
-  color: #6e4d43; 
-}
-
-.center {
-  color: #e8a0a8; 
-}
-
-.main-header {
-  font-size: 2.2rem;
-  letter-spacing: 2px;
-  color: var(--primary-brown);
-  text-transform: uppercase;
-  margin: 0;
-  line-height: 1;
-}
-
+/* Gruppi laterali: larghezza uguale, così il logo resta centrato */
+.main-header .header-container,
 .main-header .header-actions {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 18px;
-  flex: 1;
+  flex: 1 1 0;
+  gap: 2px;
+  min-width: min-content;
 }
 
+.main-header .header-actions {
+  justify-content: flex-end;
+}
+
+/* Logo: cresce con lo schermo e, se serve, va su due righe */
+.main-header .brand-logo {
+  flex: 0 1 auto;
+  min-width: 0;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.logo {
+  display: block;
+  margin: 0;
+  font-family: "Pacifico", cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: clamp(1.15rem, 0.6rem + 2.6vw, 3rem);
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  text-wrap: balance;
+}
+
+.start-end {
+  color: #6e4d43;
+}
+
+.center {
+  color: #e8a0a8;
+}
+
+/* Pulsanti a icona: area di tocco da 44px */
 .main-header .icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 6px;
   background: none;
   border: none;
-  font-size: 1.25rem;
   color: var(--primary-brown);
+  font-size: 1.25rem;
+  text-decoration: none;
   cursor: pointer;
-  position: relative;
-  padding: 6px;
   transition: transform 0.2s ease, color 0.2s ease;
 }
 
-.main-header .icon-btn:hover {
-  transform: scale(1.1);
-  color: var(--secondary-brown);
+/* L'effetto al passaggio solo dove esiste il mouse */
+@media (hover: hover) {
+  .main-header .icon-btn:hover {
+    transform: scale(1.1);
+    color: var(--secondary-brown);
+  }
+}
+
+/* L'hamburger compare solo su mobile */
+.main-header .hamburger {
+  display: none;
 }
 
 .main-header .cart-badge {
   position: absolute;
-  top: -4px;
-  right: -6px;
-  background-color: var(--accent-pink);
-  color: #ffffff;
-  font-size: 0.7rem;
-  font-weight: 700;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
+  top: 2px;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 18px;
+  height: 18px;
+  background-color: var(--accent-pink);
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
 }
 
-/* Navigation Bar & Menu Dropdown */
+/*
+   MENU PRINCIPALE (BASE)
+ */
 .main-nav {
   background-color: var(--primary-brown);
 }
 
 .main-nav .nav-links {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 25px;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.main-nav .nav-links > li {
-  position: relative; /* Posizionamento per il dropdown */
+.main-nav .dropdown-menu {
+  list-style: none;
 }
 
-.main-nav .nav-links > li > a {
+.main-nav .nav-row {
+  display: flex;
+}
+
+.main-nav .nav-link {
   display: block;
   padding: 14px 16px;
+  background: none;
+  border: none;
   color: #ffffff;
-  text-decoration: none;
+  font-family: inherit;
   font-size: 0.88rem;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
   font-weight: 500;
+  letter-spacing: 1.2px;
+  text-align: left;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
   transition: background-color 0.2s, opacity 0.2s;
 }
 
-.main-nav .nav-links > li > a:hover,
-.main-nav .nav-links > li > a.active {
+.main-nav .nav-link:hover,
+.main-nav .nav-link.active {
   background-color: var(--secondary-brown);
 }
 
-/* Gestione Dropdown Menu */
-.main-nav .dropdown:hover .dropdown-menu {
-  display: block;
+/* Elementi usati solo dal pannello mobile */
+.main-nav .drawer-header,
+.main-nav .submenu-toggle,
+.main-nav .nav-caret,
+.nav-backdrop {
+  display: none;
+}
+
+/*
+   DESKTOP (da 992px)
+ */
+@media (min-width: 992px) {
+  .main-nav .nav-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(4px, 1.6vw, 25px);
+  }
+
+  .main-nav .nav-links > li {
+    position: relative;
+  }
+
+  .main-nav .dropdown .dropdown-menu {
+    display: block;
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 200px;
+    margin: 0;
+    padding: 8px 0;
+    background-color: #ffffff;
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(10px);
+    transition: all 0.25s ease;
+    z-index: 1000;
+  }
+
+  /* Apertura con il mouse e da tastiera */
+  .main-nav .dropdown:hover .dropdown-menu,
+  .main-nav .dropdown:has(:focus-visible) .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .main-nav .dropdown .dropdown-menu li a {
+    display: block;
+    padding: 10px 20px;
+    color: var(--primary-brown);
+    font-size: 0.85rem;
+    text-decoration: none;
+    text-transform: capitalize;
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  .main-nav .dropdown .dropdown-menu li a:hover {
+    background-color: var(--cream-bg);
+    color: var(--accent-pink);
+  }
+}
+
+/*
+   MOBILE E TABLET (fino a 991px)
+   Il menu diventa un pannello laterale
+ */
+@media (max-width: 991px) {
+  .main-header .hamburger {
+    display: inline-flex;
+  }
+
+  .nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1400;
+    background: rgba(62, 39, 35, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+
+  .nav-backdrop.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .main-nav {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    width: min(86vw, 360px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    visibility: hidden;
+    transform: translateX(-100%);
+    transition: transform 0.28s ease, visibility 0.28s;
+  }
+
+  .main-nav.open {
+    visibility: visible;
+    transform: translateX(0);
+    box-shadow: 8px 0 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .main-nav .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 8px 8px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+  }
+
+  .main-nav .drawer-title {
+    font-family: "Pacifico", cursive;
+    font-size: 1.3rem;
+  }
+
+  .main-nav .drawer-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 1.3rem;
+    cursor: pointer;
+  }
+
+  .main-nav .nav-links {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .main-nav .nav-links > li {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .main-nav .nav-link {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 0.95rem;
+  }
+
+  /* Freccia per aprire il gruppo (Prodotti) */
+  .main-nav .submenu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 56px;
+    background: none;
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    cursor: pointer;
+  }
+
+  .main-nav .nav-caret {
+    display: inline-block;
+  }
+
+  .main-nav .submenu-toggle i,
+  .main-nav .nav-caret {
+    font-size: 0.8rem;
+    transition: transform 0.25s ease;
+  }
+
+  .main-nav .dropdown.open .submenu-toggle i,
+  .main-nav .dropdown.open .nav-caret {
+    transform: rotate(180deg);
+  }
+
+  /* Gruppi a fisarmonica */
+  .main-nav .dropdown .dropdown-menu {
+    display: block;
+    position: static;
+    min-width: 0;
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    visibility: hidden;
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: 0;
+    box-shadow: none;
+    transition: max-height 0.3s ease, visibility 0s linear 0.3s;
+  }
+
+  .main-nav .dropdown.open .dropdown-menu {
+    max-height: 70vh;
+    overflow-y: auto;
+    visibility: visible;
+    transition: max-height 0.3s ease, visibility 0s;
+  }
+
+  .main-nav .dropdown .dropdown-menu li a {
+    display: block;
+    padding: 13px 20px 13px 34px;
+    color: #ffffff;
+    font-size: 0.92rem;
+    text-decoration: none;
+    text-transform: capitalize;
+    transition: background-color 0.2s;
+  }
+
+  .main-nav .dropdown .dropdown-menu li a:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+}
+
+
+/*
+   MENU ACCOUNT (UTENTE LOGGATO)
+ */
+.account-menu {
+  position: relative;
+}
+
+.main-header .account-btn {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: var(--primary-brown);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 0 0 2px #e8a0a8;
+}
+
+.avatar i {
+  font-size: 0.9rem;
+}
+
+/* Il padding in alto tiene unito icona e menu, così non si chiude passando il mouse */
+.account-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  padding-top: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+  z-index: 1100;
+}
+
+.account-menu.open .account-dropdown {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
 }
 
-.main-nav .dropdown .dropdown-menu {
-  display: block;
-  opacity: 0;
-  visibility: hidden;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: #ffffff;
-  min-width: 200px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  list-style: none;
-  padding: 8px 0;
-  margin: 0;
-  border-radius: 0 0 6px 6px;
-  transform: translateY(10px);
-  transition: all 0.25s ease;
-  z-index: 1000;
+/* Apertura al passaggio del mouse, solo dove esiste l'hover (non sul telefono) */
+@media (hover: hover) {
+  .account-menu:hover .account-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
 }
 
-.main-nav .dropdown .dropdown-menu li a {
-  display: block;
-  padding: 10px 20px;
+.account-card {
+  min-width: 220px;
+  padding: 6px 0;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.account-user {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 16px 12px;
+  border-bottom: 1px solid #f0e6df;
+}
+
+.account-user small {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.account-user strong {
   color: var(--primary-brown);
+  font-size: 0.98rem;
+  overflow-wrap: anywhere;
+}
+
+.account-card a,
+.account-card .logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  color: var(--primary-brown);
+  font-family: inherit;
+  font-size: 0.9rem;
+  text-align: left;
   text-decoration: none;
-  font-size: 0.85rem;
-  text-transform: capitalize;
+  cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
 }
 
-.main-nav .dropdown .dropdown-menu li a:hover {
+.account-card a i,
+.account-card .logout-btn i {
+  width: 16px;
+  text-align: center;
+  color: var(--secondary-brown);
+}
+
+.account-card a:hover,
+.account-card .logout-btn:hover {
   background-color: var(--cream-bg);
   color: var(--accent-pink);
+}
+
+.account-card a:hover i,
+.account-card .logout-btn:hover i {
+  color: var(--accent-pink);
+}
+
+.account-card .logout-btn {
+  margin-top: 4px;
+  border-top: 1px solid #f0e6df;
+}
+
+
+/*
+   RICERCA
+ */
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 70px 16px 16px;
+  background: rgba(62, 39, 35, 0.45);
+  animation: search-fade 0.15s ease-out;
+}
+
+@keyframes search-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.search-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 640px;
+  max-height: calc(100dvh - 90px);
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid #f0e6df;
+}
+
+.search-form > i {
+  color: var(--secondary-brown);
+}
+
+.search-form input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--primary-brown);
+  font-family: inherit;
+  font-size: 1.05rem;
+}
+
+.search-form input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.search-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.search-close:hover {
+  color: var(--accent-pink);
+}
+
+.search-results {
+  overflow-y: auto;
+}
+
+.search-results ul {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+}
+
+.search-hint {
+  padding: 22px 18px;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+.suggestion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 18px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.suggestion:hover,
+.suggestion:focus-visible {
+  background: var(--cream-bg);
+  outline: none;
+}
+
+.suggestion img,
+.suggestion .no-img {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: #f5efe9;
+}
+
+.suggestion img {
+  object-fit: cover;
+}
+
+.suggestion-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.suggestion-name {
+  overflow: hidden;
+  color: var(--primary-brown);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.suggestion-category {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.suggestion-price {
+  flex-shrink: 0;
+  color: var(--primary-brown);
+  font-weight: 700;
+}
+
+.suggestion-price .old {
+  margin-right: 6px;
+  color: #9e9e9e;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.search-all {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--cream-bg);
+  border: none;
+  border-top: 1px solid #f0e6df;
+  color: var(--primary-brown);
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.search-all:hover {
+  color: var(--accent-pink);
+}
+
+@media (max-width: 600px) {
+  .search-overlay {
+    padding: 12px;
+  }
+
+  .search-panel {
+    max-height: calc(100dvh - 24px);
+  }
 }

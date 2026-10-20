@@ -1,12 +1,17 @@
 <div class="product-card">
-    <!-- Badge Offerta o In Evidenza -->
-    @if (product().isOffer && product().discountPercent) {
-        <span class="badge-sale">-{{ product().discountPercent }}%</span>
-    } @else if (product().featured && product().isOffer && product().discountPercent) {
-        <span class="badge-featured">In Evidenza</span>
-        <span class="badge-sale">-{{ product().discountPercent }}%</span>
-    } @else if (product().featured) {
-        <span class="badge-featured">In Evidenza</span>
+
+    <!-- Badge del prodotto (solo quelli attivi) -->
+    @if (visibleBadges().length > 0) {
+        <div class="badge-stack">
+            @for (badge of visibleBadges(); track badge.id) {
+                <span
+                    class="product-badge"
+                    [style.backgroundColor]="badge.background_color"
+                    [style.color]="badge.text_color">
+                    {{ badgeLabel(badge) }}
+                </span>
+            }
+        </div>
     }
 
     <div class="card-img-wrapper" [routerLink]="['/prodotti', (product().categoryName || 'all').toLowerCase(), product().id]">

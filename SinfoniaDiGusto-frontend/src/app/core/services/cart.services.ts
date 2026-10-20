@@ -52,7 +52,7 @@ export class CartStateService{
 
     updateQuantity(productId: number, quantity: number): void{
         if(quantity <= 0){
-            this.removeItem(productId);
+            // this.removeItem(productId);
             return;
         }
         this.cartItems.update(items =>

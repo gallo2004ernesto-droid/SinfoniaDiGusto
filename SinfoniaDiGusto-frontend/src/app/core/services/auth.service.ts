@@ -1,6 +1,105 @@
-import { Injectable, signal } from '@angular/core';
+// import { HttpClient } from '@angular/common/http';
+// import { computed, inject, Injectable, signal } from '@angular/core';
+// import { AuthResponse, LoginRequest, RegisterRequest, UserRole } from '../model/auth.model';
+// import { Observable, tap } from 'rxjs';
+
+// @Injectable({
+//   providedIn: 'root'
+// })
+// export class AuthService {
+
+//   private http = inject(HttpClient);
+
+//   private apiUrl = 'http://localhost:8080/api/v1/auth';
+
+//   // Utente attualmente autenticato
+//   currentUser = signal<AuthResponse | null>(this.getStoredUser());
+
+//   // true se l'utente è autenticato
+//   isAuthenticated = computed(() => this.currentUser() !== null);
+
+//   // true se l'utente è amministratore
+//   isAdmin = computed(() => this.currentUser()?.role === 'ADMIN');
+
+//   /**
+//    * Registrazione
+//    */
+//   register(request: RegisterRequest): Observable<AuthResponse> {
+//     return this.http
+//       .post<AuthResponse>(`${this.apiUrl}/register`, request)
+//       .pipe(
+//         tap((response) => this.handleAuthSuccess(response))
+//       );
+//   }
+
+//   /**
+//    * Login
+//    */
+//   login(request: LoginRequest): Observable<AuthResponse> {
+//     return this.http
+//       .post<AuthResponse>(`${this.apiUrl}/login`, request)
+//       .pipe(
+//         tap((response) => this.handleAuthSuccess(response))
+//       );
+//   }
+
+//   /**
+//    * Salva token e informazioni utente
+//    */
+//   private handleAuthSuccess(response: AuthResponse): void {
+//     localStorage.setItem('jwt_token', response.token);
+//     localStorage.setItem('user_info', JSON.stringify(response));
+
+//     this.currentUser.set(response);
+//   }
+
+//   /**
+//    * Logout
+//    */
+//   logout(): void {
+//     localStorage.removeItem('jwt_token');
+//     localStorage.removeItem('user_info');
+
+//     this.currentUser.set(null);
+//   }
+
+//   /**
+//    * Recupera il JWT
+//    */
+//   getToken(): string | null {
+//     return localStorage.getItem('jwt_token');
+//   }
+
+//   /**
+//    * Controlla se l'utente possiede un determinato ruolo
+//    */
+//   hasRole(role: UserRole): boolean {
+//     return this.currentUser()?.role === role;
+//   }
+
+//   /**
+//    * Recupera l'utente salvato nel browser
+//    */
+//   private getStoredUser(): AuthResponse | null {
+//     const stored = localStorage.getItem('user_info');
+
+//     if (!stored) {
+//       return null;
+//     }
+
+//     try {
+//       return JSON.parse(stored) as AuthResponse;
+//     } catch {
+//       localStorage.removeItem('user_info');
+//       return null;
+//     }
+//   }
+// }
+
+import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { Router } from '@angular/router';
 import { LoginRequest, RegisterRequest, AuthResponse } from '../model/auth.model'; 
 
 @Injectable({
@@ -11,7 +110,9 @@ export class AuthService {
   private readonly TOKEN_KEY = 'jwt_token';
   private readonly USER_KEY = 'user_info';
 
-   currentUser = signal<AuthResponse | null>(this.getStoredUser());
+  private readonly router = inject(Router);
+
+  currentUser = signal<AuthResponse | null>(this.getStoredUser());
 
   constructor(private http: HttpClient) {}
 
@@ -42,6 +143,12 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
+
+    // Aggiorna lo stato dell'utente
+    this.currentUser.set(null);
+
+    // Reindirizza alla homepage
+    this.router.navigateByUrl('/');
   }
 
   getToken(): string | null {

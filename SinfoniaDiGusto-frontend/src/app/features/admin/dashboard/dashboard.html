@@ -7,62 +7,71 @@
   </div>
 
   @if (isLoading()) {
-    <div class="loading-state">
-      <p>Caricamento statistiche in corso...</p>
-    </div>
+  <div class="loading-state">
+    <p>Caricamento statistiche in corso...</p>
+  </div>
   } @else {
-    <!-- GRIGLIA CARDS STATISTICHE -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-info">
-          <span class="stat-label">Prodotti Totali</span>
-          <span class="stat-value">{{ stats()?.totalProducts || 0 }}</span>
-        </div>
-        <div class="stat-icon badge-blue">📦</div>
+  <!-- GRIGLIA CARDS STATISTICHE -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Prodotti Totali</span>
+        <span class="stat-value">{{ stats()?.totalProducts || 0 }}</span>
       </div>
-
-      <div class="stat-card">
-        <div class="stat-info">
-          <span class="stat-label">Categorie</span>
-          <span class="stat-value">{{ stats()?.totalCategories || 0 }}</span>
-        </div>
-        <div class="stat-icon badge-purple">🏷️</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-info">
-          <span class="stat-label">In Offerta</span>
-          <span class="stat-value">{{ stats()?.onSaleCount }}</span>
-        </div>
-        <div class="stat-icon badge-green">🔥</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-info">
-          <span class="stat-label">In Evidenza</span>
-          <span class="stat-value">{{ stats()?.featuredCount }}</span>
-        </div>
-        <div class="stat-icon badge-gold">★</div>
-      </div>
+      <div class="stat-icon badge-blue">📦</div>
     </div>
 
-    <!-- AZIONI RAPIDE -->
-    <div class="quick-actions">
-      <h3>Azioni Rapide</h3>
-      <div class="actions-grid">
-        <a [routerLink]="['/admin', 'prodotti']" class="action-card">
-          <h4>Gestisci Prodotti</h4>
-          <p>Aggiungi, modifica o rimuovi prodotti dal catalogo.</p>
-        </a>
-        <a [routerLink]="['/admin', 'categorie']" class="action-card">
-          <h4>Gestisci Categorie</h4>
-          <p>Crea e organizza le categorie del tuo shop.</p>
-        </a>
-        <a [routerLink]="['/admin', 'il-mio-profilo']" class="action-card">
-          <h4>Modifica Profilo</h4>
-          <p>Aggiorna i tuoi dati e cambia la password.</p>
-        </a>
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">Categorie</span>
+        <span class="stat-value">{{ stats()?.totalCategories || 0 }}</span>
       </div>
+      <div class="stat-icon badge-purple">🏷️</div>
     </div>
+
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">In Offerta</span>
+        <span class="stat-value">{{ stats()?.onSaleCount }}</span>
+      </div>
+      <div class="stat-icon badge-green">🔥</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-info">
+        <span class="stat-label">In Evidenza</span>
+        <span class="stat-value">{{ stats()?.featuredCount }}</span>
+      </div>
+      <div class="stat-icon badge-gold">★</div>
+    </div>
+  </div>
+
+  <!-- AZIONI RAPIDE -->
+  <div class="quick-actions">
+    <h3>Azioni Rapide</h3>
+    <div class="actions-grid">
+      <a [routerLink]="['/admin', 'coupon']" class="action-card">
+        <h4>Gestisci Codice Promo</h4>
+        <p>Crea, modifica ed elimina i codici sconto.</p>
+      </a>
+      <a [routerLink]="['/admin', 'badge']" class="action-card">
+        <h4>Gestisci Badge</h4>
+        <p>Crea, modifica ed elimina i badge dei prodotti.</p>
+      </a>
+
+      <a [routerLink]="['/admin', 'prodotti']" class="action-card">
+        <h4>Gestisci Prodotti</h4>
+        <p>Aggiungi, modifica o rimuovi prodotti dal catalogo.</p>
+      </a>
+      <a [routerLink]="['/admin', 'categorie']" class="action-card">
+        <h4>Gestisci Categorie</h4>
+        <p>Crea e organizza le categorie del tuo shop.</p>
+      </a>
+      <a [routerLink]="['/admin', 'il-mio-profilo']" class="action-card">
+        <h4>Modifica Profilo</h4>
+        <p>Aggiorna i tuoi dati e cambia la password.</p>
+      </a>
+    </div>
+  </div>
   }
 </div>

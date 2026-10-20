@@ -12,56 +12,41 @@
       </a>
     </div>
 
-    <button
-      class="hamburger"
-      (click)="toggleMenu()"
-      aria-label="Apri menu">
-      <i class="fa-solid fa-bars"></i>
+    <button class="hamburger" type="button" (click)="toggleMenu()" [attr.aria-expanded]="isMenuOpen"
+      aria-controls="admin-nav" [attr.aria-label]="isMenuOpen ? 'Chiudi menu' : 'Apri menu'">
+      <i class="fa-solid" [class.fa-bars]="!isMenuOpen" [class.fa-xmark]="isMenuOpen"></i>
     </button>
 
-    <nav class="admin-nav" [class.open]="isMenuOpen">
 
-      <a
-        [routerLink]="['/admin']"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
+
+    <nav id="admin-nav" class="admin-nav" [class.open]="isMenuOpen">
+
+      <a [routerLink]="['/admin']" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
         (click)="closeMenu()">
 
         <i class="fa-solid fa-chart-line"></i>
         <span>Dashboard</span>
       </a>
 
-      <a
-        [routerLink]="['/admin', 'prodotti']"
-        routerLinkActive="active"
-        (click)="closeMenu()">
+      <a [routerLink]="['/admin', 'prodotti']" routerLinkActive="active" (click)="closeMenu()">
 
         <i class="fa-solid fa-cake-candles"></i>
         <span>Prodotti</span>
       </a>
 
-      <a
-        [routerLink]="['/admin', 'categorie']"
-        routerLinkActive="active"
-        (click)="closeMenu()">
+      <a [routerLink]="['/admin', 'categorie']" routerLinkActive="active" (click)="closeMenu()">
 
         <i class="fa-solid fa-tags"></i>
         <span>Categorie</span>
       </a>
 
-      <a
-        [routerLink]="['/admin', 'ordini']"
-        routerLinkActive="active"
-        (click)="closeMenu()">
+      <a [routerLink]="['/admin', 'ordini']" routerLinkActive="active" (click)="closeMenu()">
 
         <i class="fa-solid fa-box-open"></i>
         <span>Ordini</span>
       </a>
 
-      <a
-        [routerLink]="['/admin', 'clienti']"
-        routerLinkActive="active"
-        (click)="closeMenu()">
+      <a [routerLink]="['/admin', 'clienti']" routerLinkActive="active" (click)="closeMenu()">
 
         <i class="fa-solid fa-users"></i>
         <span>Clienti</span>
@@ -69,27 +54,19 @@
 
       <div class="nav-right">
 
-        <a
-          [routerLink]="['/admin', 'il-mio-profilo']"
-          class="profile-link"
-          (click)="closeMenu()">
+        <a [routerLink]="['/admin', 'il-mio-profilo']" class="profile-link" (click)="closeMenu()">
 
           <i class="fa-solid fa-user-circle"></i>
           <span>{{ authService.currentUser()?.firstName }}</span>
         </a>
 
-        <a
-          routerLink="/"
-          class="btn-store"
-          (click)="closeMenu()">
+        <a routerLink="/" class="btn-store" (click)="closeMenu()">
 
           <i class="fa-solid fa-store"></i>
           <span>Torna al Negozio</span>
         </a>
 
-        <button
-          class="btn-logout"
-          (click)="authService.logout()">
+        <button class="btn-logout" type="button" (click)="closeMenu(); authService.logout()">
 
           <i class="fa-solid fa-right-from-bracket"></i>
           <span>Logout</span>

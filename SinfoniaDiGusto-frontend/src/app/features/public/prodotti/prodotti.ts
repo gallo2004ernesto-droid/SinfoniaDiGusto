@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProductStateService } from '../../../core/services/product-state.service';
@@ -22,7 +22,7 @@ import { ProductCard } from '../../../shared/component/product-card/product-card
   templateUrl: './prodotti.html',
   styleUrl: './prodotti.css'
 })
-export class ProductsComponent implements OnInit {
+export class ProductsComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
 
   public productState = inject(ProductStateService);
@@ -63,6 +63,11 @@ export class ProductsComponent implements OnInit {
         this.productState.loadProducts();
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    // Uscendo dal catalogo i filtri non devono restare attivi nelle altre pagine
+    this.productState.resetFilters();
   }
 
   openCart(): void {

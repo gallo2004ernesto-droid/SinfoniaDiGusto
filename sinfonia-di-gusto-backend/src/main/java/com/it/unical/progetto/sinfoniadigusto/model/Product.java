@@ -66,9 +66,9 @@ public class Product {
     private Set<Badge> badges = new HashSet<>();
 
 
-    // =========================
+    
     // COSTRUTTORI
-    // =========================
+    
 
     public Product() {
     }
@@ -93,9 +93,9 @@ public class Product {
     }
 
 
-    // =========================
+    
     // GETTER / SETTER
-    // =========================
+    
 
     public Long getId() {
         return id;

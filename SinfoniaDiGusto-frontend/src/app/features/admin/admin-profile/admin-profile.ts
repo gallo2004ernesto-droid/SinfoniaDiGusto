@@ -34,16 +34,6 @@ export class AdminProfileComponent implements OnInit {
     confirmPassword: ['', [Validators.required]]
   }, { validators: this.passwordMatchValidator });
 
-  // ngOnInit(): void {
-  //   // Carica dati utente corrente dal servizio Auth
-  //   const currentUser = this.authService.getCurrentUser();
-  //   if (currentUser) {
-  //     this.profileForm.patchValue({
-  //       name: currentUser.name,
-  //       email: currentUser.email
-  //     });
-  //   }
-  // }
 
   // Custom Validator per la conferma password
   

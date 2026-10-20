@@ -17,6 +17,7 @@ export interface CreateOrderRequest {
   postalCode: string;
   notes?: string;
   paymentMethod: PaymentMethod;
+  couponCode?: string;
 }
 
 export interface OrderItemResponse {
@@ -43,4 +44,8 @@ export interface OrderResponse {
   notes?: string;
   paymentMethod: string;
   items: OrderItemResponse[];
+  couponCode?: string | null;
+  discountAmount?: number;
+  subtotal?: number;
+  shippingCost?: number | null;
 }

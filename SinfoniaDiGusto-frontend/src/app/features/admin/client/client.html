@@ -8,68 +8,69 @@
     </div>
   </div>
 
+  @if (errorMessage()) {
+  <div class="error-banner">{{ errorMessage() }}</div>
+  }
+
   <div class="filter-card">
     <div class="filter-group">
       <label for="search">Cerca Cliente</label>
-      <input 
-        id="search" 
-        type="text" 
-        placeholder="Nome, cognome o email..." 
-        [ngModel]="searchTerm()" 
-        (ngModelChange)="searchTerm.set($event)" 
-      />
+      <input id="search" type="text" placeholder="Nome, cognome o email..." [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)" />
     </div>
   </div>
 
   @if (isLoading()) {
-    <div class="state-message">Caricamento clienti...</div>
+  <div class="state-message">Caricamento clienti...</div>
   } @else {
-    <div class="table-responsive">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Cliente</th>
-            <th>Email</th>
-            <th>Ruolo</th>
-            <th>Data Reg.</th>
-            <th>Stato</th>
-            <th>Azioni</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (client of filteredClients(); track client.id) {
-            <tr>
-              <td data-label="Cliente">
-                <strong>{{ client.firstName }} {{ client.lastName }}</strong>
-              </td>
-              <td data-label="Email">{{ client.email }}</td>
-              <td data-label="Ruolo">
-                <span [class]="client.role === 'ADMIN' ? 'badge-admin' : 'badge-user'">
-                  {{ client.role }}
-                </span>
-              </td>
-              <td data-label="Data Reg.">{{ client.registrationDate | date:'dd/MM/yyyy' }}</td>
-              <td data-label="Stato">
-                <span [class]="client.active ? 'badge-active' : 'badge-disabled'">
-                  {{ client.active ? 'Attivo' : 'Bloccato' }}
-                </span>
-              </td>
-              <td data-label="Azioni" class="action-buttons">
-                <button 
-                  [class]="client.active ? 'btn-block' : 'btn-activate'" 
-                  (click)="toggleStatus(client)">
-                  {{ client.active ? 'Blocca' : 'Attiva' }}
-                </button>
-                <button class="btn-delete" (click)="deleteClient(client.id)">Elimina</button>
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td colspan="6" class="empty-cell">Nessun cliente trovato.</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Email</th>
+          <th>Ruolo</th>
+          <th>Data Reg.</th>
+          <th>Stato</th>
+          <th>Azioni</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (client of filteredClients(); track client.id) {
+        <tr>
+          <td data-label="Cliente">
+            <strong>{{ client.firstName }} {{ client.lastName }}</strong>
+          </td>
+          <td data-label="Email">{{ client.email }}</td>
+          <td data-label="Ruolo">
+            <span [class]="client.role === 'ADMIN' ? 'badge-admin' : 'badge-user'">
+              {{ client.role }}
+            </span>
+          </td>
+          <td data-label="Data Reg.">{{ client.registrationDate | date:'dd/MM/yyyy' }}</td>
+          <td data-label="Stato">
+            <span [class]="client.active ? 'badge-active' : 'badge-disabled'">
+              {{ client.active ? 'Attivo' : 'Bloccato' }}
+            </span>
+          </td>
+          <td data-label="Azioni" class="action-buttons">
+            <button type="button" [class]="client.active ? 'btn-block' : 'btn-activate'"
+              [disabled]="busyId() === client.id" (click)="toggleStatus(client)">
+              {{ client.active ? 'Blocca' : 'Attiva' }}
+            </button>
+            <button type="button" class="btn-delete" [disabled]="busyId() === client.id"
+              (click)="deleteClient(client.id)">
+              Elimina
+            </button>
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="6" class="empty-cell">Nessun cliente trovato.</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
   }
 </div>

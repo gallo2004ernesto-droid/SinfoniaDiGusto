@@ -4,12 +4,11 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { OrderService } from '../../../core/services/order.service';
 import { OrderResponse, OrderStatus } from '../../../core/model/order-status.model';
 import { Header } from '../../../shared/component/header/header';
-import { Footer } from '../../../shared/component/footer/footer';
 
 @Component({
   selector: 'app-order-confirmation',
   standalone: true,
-  imports: [RouterLink, Header],
+  imports: [CommonModule, RouterLink, Header],
   template: `
     <app-header></app-header>
     <main class="confirmation-container">
@@ -17,6 +16,43 @@ import { Footer } from '../../../shared/component/footer/footer';
         <i class="fa-solid fa-circle-check check-icon"></i>
         <h1>Ordine Confermato!</h1>
         <p>Grazie per il tuo acquisto su <strong>Sinfonia Di Gusto</strong>.</p>
+
+        @if (order(); as o) {
+          <p class="order-number">Ordine #{{ o.id }}</p>
+
+          <div class="order-recap">
+            <div class="recap-row">
+              <span>Subtotale</span>
+              <span>{{ (o.subtotal ?? o.totalAmount) | currency:'EUR':'symbol':'1.2-2' }}</span>
+            </div>
+
+            @if (o.couponCode) {
+              <div class="recap-row discount">
+                <span>Sconto ({{ o.couponCode }})</span>
+                <span>-{{ o.discountAmount | currency:'EUR':'symbol':'1.2-2' }}</span>
+              </div>
+            }
+
+            @if (o.shippingCost != null) {
+              <div class="recap-row">
+                <span>Spedizione</span>
+                <span>
+                  @if (o.shippingCost === 0) {
+                    Gratis
+                  } @else {
+                    {{ o.shippingCost | currency:'EUR':'symbol':'1.2-2' }}
+                  }
+                </span>
+              </div>
+            }
+
+            <div class="recap-row total">
+              <span>Totale</span>
+              <span>{{ o.totalAmount | currency:'EUR':'symbol':'1.2-2' }}</span>
+            </div>
+          </div>
+        }
+
         <p class="sub-text">Abbiamo inviato un'email di conferma con il riepilogo del tuo ordine.</p>
         <a routerLink="/prodotti" class="btn-home">Torna al Catalogo</a>
       </div>
@@ -50,6 +86,37 @@ import { Footer } from '../../../shared/component/footer/footer';
       color: #6d4c41;
       font-size: 1.05rem;
       margin: 4px 0;
+    }
+    .order-number {
+      font-weight: 700;
+      color: #3e2723;
+      margin-top: 12px;
+    }
+    .order-recap {
+      margin: 20px 0;
+      padding: 16px 20px;
+      background: #faf6f0;
+      border-radius: 12px;
+      text-align: left;
+    }
+    .recap-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      color: #6d4c41;
+      margin-bottom: 6px;
+    }
+    .recap-row.discount {
+      color: #2e7d32;
+      font-weight: 600;
+    }
+    .recap-row.total {
+      margin: 10px 0 0;
+      padding-top: 10px;
+      border-top: 1px dashed #e0d5ce;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #3e2723;
     }
     .sub-text {
       font-size: 0.9rem;

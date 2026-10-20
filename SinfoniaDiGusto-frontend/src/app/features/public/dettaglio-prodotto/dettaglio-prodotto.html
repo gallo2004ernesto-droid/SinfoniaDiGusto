@@ -17,12 +17,12 @@
     <!-- Breadcrumb Navigazione Dinamica -->
     <nav class="breadcrumb">
       <a routerLink="/prodotti">Catalogo</a>
-      
+
       @if (isOffertRoute()) {
         <i class="fa-solid fa-chevron-right"></i>
-        <a routerLink="/prodotti/offerta">Offerte</a>
+        <a routerLink="/prodotti/offerte">Offerte</a>
         <i class="fa-solid fa-chevron-right"></i>
-        <a [routerLink]="['/prodotti/offerta', (product()?.categoryName || product()?.category)?.toLowerCase()]">
+        <a [routerLink]="['/prodotti/offerte', (product()?.categoryName || product()?.category)?.toLowerCase()]">
           {{ product()?.categoryName || product()?.category }}
         </a>
       } @else {
@@ -39,15 +39,20 @@
     <div class="product-detail-layout">
       <!-- Immagine Prodotto e Badge -->
       <div class="image-column">
-        <div class="badges-container">
-          @if (product()?.featured) {
-            <span class="badge-featured">In Evidenza</span>
-          }
-          @if (product()?.isOffer && product()?.discountPercent) {
-            <span class="badge-sale">-{{ product()?.discountPercent }}%</span>
-          }
-        </div>
-        
+
+        @if (visibleBadges().length > 0) {
+          <div class="badges-container">
+            @for (badge of visibleBadges(); track badge.id) {
+              <span
+                class="product-badge"
+                [style.backgroundColor]="badge.background_color"
+                [style.color]="badge.text_color">
+                {{ badgeLabel(badge) }}
+              </span>
+            }
+          </div>
+        }
+
         <!-- GET Immagine tramite funzione getImageUrl -->
         <img [src]="getImageUrl(product()?.imageUrl)" [alt]="product()?.name" class="main-image">
       </div>
@@ -69,19 +74,48 @@
 
         <p class="description">{{ product()?.description }}</p>
 
+        <!-- Disponibilità -->
+        @if (isOutOfStock()) {
+          <p class="stock-info out">Prodotto esaurito</p>
+        } @else if (stock() <= 5) {
+          <p class="stock-info low">Ultimi {{ stock() }} pezzi disponibili</p>
+        }
+
         <!-- Selettore Quantità e Pulsante Aggiungi al Carrello -->
         <div class="actions-row">
           <div class="quantity-selector">
-            <button (click)="decrementQuantity()" [disabled]="quantity() <= 1" aria-label="Riduci quantità">-</button>
-            <span>{{ quantity() }}</span>
-            <button (click)="incrementQuantity()" aria-label="Aumenta quantità">+</button>
+            <button type="button" (click)="decrementQuantity()"
+              [disabled]="displayQuantity() <= 1 || maxQuantity() === 0" aria-label="Riduci quantità">-</button>
+
+            <span>{{ displayQuantity() }}</span>
+
+            <button type="button" (click)="incrementQuantity()"
+              [disabled]="displayQuantity() >= maxQuantity()" aria-label="Aumenta quantità">+</button>
           </div>
 
-          <button class="add-to-cart-btn" (click)="addToCart()">
+          <button type="button" class="add-to-cart-btn" (click)="addToCart()" [disabled]="maxQuantity() === 0">
             <i class="fa-solid fa-bag-shopping"></i>
-            Aggiungi al Carrello
+
+            @if (isOutOfStock()) {
+              Esaurito
+            } @else if (maxQuantity() === 0) {
+              Già al massimo nel carrello
+            } @else {
+              Aggiungi al Carrello
+            }
           </button>
         </div>
+
+        <!-- Messaggi sulla quantità -->
+        @if (!isOutOfStock()) {
+          @if (inCartQuantity() > 0) {
+            <p class="stock-hint">Nel carrello: {{ inCartQuantity() }} su {{ stock() }} disponibili</p>
+          }
+
+          @if (maxQuantity() > 0 && displayQuantity() >= maxQuantity()) {
+            <p class="stock-hint">Hai raggiunto la disponibilità massima.</p>
+          }
+        }
       </div>
     </div>
 
@@ -95,7 +129,7 @@
             <p>Scarica il PDF allegato con ingredienti e allergeni.</p>
           </div>
         </div>
-        
+
         <!-- Chiamata al metodo openPdf() del componente -->
         <button type="button" (click)="openPdf()" class="download-pdf-btn">
           <i class="fa-solid fa-download"></i> Scarica PDF

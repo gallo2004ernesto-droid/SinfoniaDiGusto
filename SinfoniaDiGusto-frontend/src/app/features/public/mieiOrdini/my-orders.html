@@ -62,7 +62,32 @@
                 }
               </div>
 
-              <div class="order-summary-footer">
+                            <div class="order-summary-footer">
+                <div class="summary-line">
+                  <span>Subtotale:</span>
+                  <span>{{ order.subtotal | currency:'EUR':'symbol':'1.2-2' }}</span>
+                </div>
+
+                @if (order.couponCode) {
+                  <div class="summary-line discount">
+                    <span>Sconto ({{ order.couponCode }}):</span>
+                    <span>-{{ order.discountAmount | currency:'EUR':'symbol':'1.2-2' }}</span>
+                  </div>
+                }
+
+                @if (order.shippingCost != null) {
+                  <div class="summary-line">
+                    <span>Spedizione:</span>
+                    <span>
+                      @if (order.shippingCost === 0) {
+                        Gratis
+                      } @else {
+                        {{ order.shippingCost | currency:'EUR':'symbol':'1.2-2' }}
+                      }
+                    </span>
+                  </div>
+                }
+
                 <div class="summary-line total">
                   <span>Totale Ordine:</span>
                   <span>{{ order.totalAmount | currency:'EUR':'symbol':'1.2-2' }}</span>

@@ -1,0 +1,336 @@
+
+<app-admin-header></app-admin-header>
+
+<div class="badges-container">
+
+  <div class="header-actions">
+    <div>
+      <h2>Gestione Badge</h2>
+      <p>Gestisci nomi, codici, colori e stato dei badge.</p>
+    </div>
+
+    <button
+      type="button"
+      class="btn-create"
+      (click)="openCreateModal()"
+    >
+      Nuovo Badge
+    </button>
+  </div>
+
+  <!-- FILTRI -->
+  @if (pageError()) {
+    <div class="error-banner">{{ pageError() }}</div>
+  }
+  <div class="filter-card">
+
+    <div class="filter-group">
+      <label for="search">Cerca badge</label>
+
+      <input
+        id="search"
+        type="text"
+        placeholder="Nome o codice..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+      />
+    </div>
+
+    <div class="filter-group">
+      <label for="status">Stato</label>
+
+      <select
+        id="status"
+        [ngModel]="selectedStatus()"
+        (ngModelChange)="selectedStatus.set($event)"
+      >
+        <option value="ALL">Tutti i badge</option>
+        <option value="ACTIVE">Attivi</option>
+        <option value="INACTIVE">Disattivati</option>
+      </select>
+    </div>
+
+    <button
+      type="button"
+      class="btn-reset"
+      (click)="resetFilters()"
+    >
+      Reset filtri
+    </button>
+
+  </div>
+
+  <!-- CARICAMENTO -->
+
+  @if (isLoading()) {
+    <div class="state-message">
+      Caricamento badge...
+    </div>
+  } @else {
+
+    <div class="table-responsive">
+
+      <table class="data-table">
+
+        <thead>
+          <tr>
+            <!-- <th>ID</th> -->
+            <th>Anteprima</th>
+            <th>Nome</th>
+            <th>Codice</th>
+            <th>Colore sfondo</th>
+            <th>Colore testo</th>
+            <th>Icona</th>
+            <th>Stato</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          @for (badge of filteredBadges(); track badge.id) {
+            <tr>
+
+              <!-- <td data-label="ID">
+                {{ badge.id }}
+              </td> -->
+
+              <td data-label="Anteprima">
+                <span
+                  class="badge-preview"
+                  [style.backgroundColor]="badge.background_color"
+                  [style.color]="badge.text_color"
+                >
+                  {{ badge.icon }} {{ badge.name }}
+                </span>
+              </td>
+
+              <td data-label="Nome">
+                <strong>{{ badge.name }}</strong>
+              </td>
+
+              <td data-label="Codice">
+                <code>{{ badge.code }}</code>
+              </td>
+
+              <td data-label="Colore sfondo">
+                <span class="color-cell">
+                  <span
+                    class="color-dot"
+                    [style.backgroundColor]="badge.background_color"
+                  ></span>
+                  {{ badge.background_color }}
+                </span>
+              </td>
+
+              <td data-label="Colore testo">
+                <span class="color-cell">
+                  <span
+                    class="color-dot"
+                    [style.backgroundColor]="badge.text_color"
+                  ></span>
+                  {{ badge.text_color }}
+                </span>
+              </td>
+
+              <td data-label="Icona">
+                {{ badge.icon }}
+              </td>
+
+              <td data-label="Stato">
+                <span
+                  class="status-badge"
+                  [class.status-active]="badge.is_active"
+                  [class.status-inactive]="!badge.is_active"
+                >
+                  {{ badge.is_active ? 'Attivo' : 'Disattivato' }}
+                </span>
+              </td>
+
+              <td data-label="Azioni" class="action-buttons">
+                <button
+                  type="button"
+                  class="btn-edit"
+                  (click)="openEditModal(badge)"
+                >
+                  Modifica
+                </button>
+
+                @if (badge.id != null) {
+                  <button
+                    type="button"
+                    class="btn-delete"
+                    (click)="deleteBadge(badge.id!)"
+                  >
+                    Elimina
+                  </button>
+                }
+              </td>
+
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="empty-cell">
+                Nessun badge trovato.
+              </td>
+            </tr>
+          }
+
+        </tbody>
+      </table>
+
+    </div>
+  }
+
+  <!-- MODALE -->
+
+  
+
+  @if (showModal) {
+    <div class="modal-backdrop" (click)="closeModal()">
+
+      <div
+        class="modal-card"
+        (click)="$event.stopPropagation()"
+      >
+
+        <h3>
+          {{ editingBadge ? 'Modifica Badge' : 'Nuovo Badge' }}
+        </h3>
+
+        @if (formError()) {
+          <div class="error-banner">{{ formError() }}</div>
+        }
+
+        <form
+          [formGroup]="badgeForm"
+          (ngSubmit)="onSubmit()"
+        >
+
+          <div class="form-group">
+            <label for="name">Nome *</label>
+
+            <input
+              id="name"
+              type="text"
+              formControlName="name"
+              placeholder="Es. Novità"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="code">Codice *</label>
+
+            <input
+              id="code"
+              type="text"
+              formControlName="code"
+              placeholder="Es. NEW"
+            />
+          </div>
+
+          <div class="form-row">
+
+            <div class="form-group">
+              <label for="background_color">
+                Colore sfondo *
+              </label>
+
+              <input
+                id="background_color"
+                type="color"
+                formControlName="background_color"
+              />
+
+              <small>
+                {{ badgeForm.controls.background_color.value }}
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label for="text_color">
+                Colore testo *
+              </label>
+
+              <input
+                id="text_color"
+                type="color"
+                formControlName="text_color"
+              />
+
+              <small>
+                {{ badgeForm.controls.text_color.value }}
+              </small>
+            </div>
+
+          </div>
+
+          <div class="form-group">
+            <label for="icon">Icona o emoji *</label>
+
+            <input
+              id="icon"
+              type="text"
+              formControlName="icon"
+              placeholder="🏷️"
+            />
+          </div>
+
+          <!-- ANTEPRIMA LIVE -->
+
+          <div class="preview-section">
+            <label>Anteprima badge</label>
+
+            <div>
+              <span
+                class="badge-preview"
+                [style.backgroundColor]="badgeForm.controls.background_color.value"
+                [style.color]="badgeForm.controls.text_color.value"
+              >
+                {{ badgeForm.controls.icon.value }}
+                {{ badgeForm.controls.name.value || 'Nome badge' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="checkbox-row">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                formControlName="is_active"
+              />
+              Badge attivo
+            </label>
+          </div>
+
+          <div class="modal-actions">
+
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="closeModal()"
+            >
+              Annulla
+            </button>
+
+            <button
+              type="submit"
+              class="btn-save"
+              [disabled]="badgeForm.invalid || isSaving()"
+            >
+              {{
+                isSaving()
+                  ? 'Salvataggio...'
+                  : 'Salva Badge'
+              }}
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  }
+
+</div>

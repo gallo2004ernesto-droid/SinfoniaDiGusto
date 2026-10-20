@@ -1,0 +1,290 @@
+<app-admin-header></app-admin-header>
+
+<div class="coupons-container">
+
+  <div class="header-actions">
+    <div>
+      <h2>Codici Sconto</h2>
+      <p>Crea e gestisci i codici promozionali da usare nel checkout.</p>
+    </div>
+
+    <button type="button" class="btn-create" (click)="openCreateModal()">
+      Nuovo Codice
+    </button>
+  </div>
+
+  @if (pageError()) {
+    <div class="error-banner">{{ pageError() }}</div>
+  }
+
+  <!-- FILTRI -->
+  <div class="filter-card">
+
+    <div class="filter-group">
+      <label for="search">Cerca codice</label>
+
+      <input id="search" type="text" placeholder="Codice o descrizione..." [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)" />
+    </div>
+
+    <div class="filter-group">
+      <label for="status">Stato</label>
+
+      <select id="status" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+        <option value="ALL">Tutti</option>
+        <option value="ACTIVE">Attivi</option>
+        <option value="SCHEDULED">Programmati</option>
+        <option value="EXPIRED">Scaduti</option>
+        <option value="EXHAUSTED">Esauriti</option>
+        <option value="DISABLED">Disattivati</option>
+      </select>
+    </div>
+
+    <div class="filter-group btn-reset-wrapper">
+      <button type="button" class="btn-reset" (click)="resetFilters()">
+        Reset filtri
+      </button>
+    </div>
+
+  </div>
+
+  <!-- CARICAMENTO -->
+  @if (isLoading()) {
+
+    <div class="state-message">
+      Caricamento codici sconto...
+    </div>
+
+  } @else {
+
+    <div class="table-responsive">
+
+      <table class="data-table">
+
+        <thead>
+          <tr>
+            <th>Codice</th>
+            <th>Sconto</th>
+            <th>Ordine minimo</th>
+            <th>Validità</th>
+            <th>Utilizzi</th>
+            <th>Stato</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          @for (coupon of filteredCoupons(); track coupon.id) {
+            <tr>
+
+              <td data-label="Codice">
+                <div class="code-cell">
+                  <code>{{ coupon.code }}</code>
+                  @if (coupon.description) {
+                    <small class="text-muted">{{ coupon.description }}</small>
+                  }
+                </div>
+              </td>
+
+              <td data-label="Sconto">
+                <strong>
+                  @if (coupon.discountType === 'PERCENT') {
+                    -{{ coupon.discountValue }}%
+                  } @else {
+                    -{{ coupon.discountValue | currency:'EUR':'symbol':'1.2-2' }}
+                  }
+                </strong>
+              </td>
+
+              <td data-label="Ordine minimo">
+                @if (coupon.minOrderAmount) {
+                  {{ coupon.minOrderAmount | currency:'EUR':'symbol':'1.2-2' }}
+                } @else {
+                  <span class="text-muted">Nessuno</span>
+                }
+              </td>
+
+              <td data-label="Validità">
+                @if (coupon.validFrom || coupon.validUntil) {
+                  <span>
+                    {{ coupon.validFrom ? (coupon.validFrom | date:'dd/MM/yyyy') : 'subito' }}
+                    →
+                    {{ coupon.validUntil ? (coupon.validUntil | date:'dd/MM/yyyy') : 'senza scadenza' }}
+                  </span>
+                } @else {
+                  <span class="text-muted">Sempre</span>
+                }
+              </td>
+
+              <td data-label="Utilizzi">
+                {{ coupon.usedCount ?? 0 }}
+                @if (coupon.usageLimit) {
+                  / {{ coupon.usageLimit }}
+                } @else {
+                  <span class="text-muted">/ illimitati</span>
+                }
+              </td>
+
+              <td data-label="Stato">
+                <span class="status-badge" [ngClass]="statusClass(coupon.status)">
+                  {{ statusLabel(coupon.status) }}
+                </span>
+              </td>
+
+              <td data-label="Azioni" class="action-buttons">
+                <button type="button" class="btn-edit" (click)="openEditModal(coupon)">
+                  Modifica
+                </button>
+
+                <button type="button" class="btn-delete" (click)="deleteCoupon(coupon.id!)">
+                  Elimina
+                </button>
+              </td>
+
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty-cell">
+                Nessun codice sconto trovato.
+              </td>
+            </tr>
+          }
+
+        </tbody>
+      </table>
+
+    </div>
+  }
+
+  <!-- MODALE -->
+  @if (showModal) {
+    <div class="modal-backdrop" (click)="closeModal()">
+
+      <div class="modal-card" (click)="$event.stopPropagation()">
+
+        <h3>
+          {{ editingCoupon ? 'Modifica Codice Sconto' : 'Nuovo Codice Sconto' }}
+        </h3>
+
+        @if (formError()) {
+          <div class="error-banner">{{ formError() }}</div>
+        }
+
+        <form [formGroup]="couponForm" (ngSubmit)="onSubmit()">
+
+          <!-- CODICE -->
+          <div class="form-group">
+            <label for="code">Codice *</label>
+
+            <div class="code-input-row">
+              <input id="code" type="text" formControlName="code" placeholder="Es. ESTATE10" />
+
+              @if (!editingCoupon || !editingCoupon.usedCount) {
+                <button type="button" class="btn-generate" (click)="generateCode()">
+                  Genera
+                </button>
+              }
+            </div>
+
+            @if (editingCoupon && editingCoupon.usedCount) {
+              <small class="text-muted">
+                Il codice non si può cambiare dopo il primo utilizzo.
+              </small>
+            } @else {
+              <small class="text-muted">
+                3-30 caratteri: lettere, numeri, trattino o underscore. Viene salvato in maiuscolo.
+              </small>
+            }
+          </div>
+
+          <!-- DESCRIZIONE -->
+          <div class="form-group">
+            <label for="description">Descrizione (interna)</label>
+            <input id="description" type="text" formControlName="description"
+              placeholder="Es. Promo di benvenuto" />
+          </div>
+
+          <!-- TIPO E VALORE -->
+          <div class="form-row">
+
+            <div class="form-group">
+              <label for="discountType">Tipo di sconto *</label>
+
+              <select id="discountType" formControlName="discountType">
+                <option value="PERCENT">Percentuale (%)</option>
+                <option value="FIXED">Importo fisso (€)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="discountValue">
+                {{ couponForm.controls.discountType.value === 'PERCENT' ? 'Sconto (%) *' : 'Sconto (€) *' }}
+              </label>
+
+              <input id="discountValue" type="number" step="0.01" min="0" formControlName="discountValue" />
+            </div>
+
+          </div>
+
+          <!-- ORDINE MINIMO E LIMITE -->
+          <div class="form-row">
+
+            <div class="form-group">
+              <label for="minOrderAmount">Ordine minimo (€)</label>
+              <input id="minOrderAmount" type="number" step="0.01" min="0" formControlName="minOrderAmount"
+                placeholder="Nessuno" />
+            </div>
+
+            <div class="form-group">
+              <label for="usageLimit">Utilizzi massimi</label>
+              <input id="usageLimit" type="number" min="1" formControlName="usageLimit"
+                placeholder="Illimitati" />
+            </div>
+
+          </div>
+
+          <!-- DATE -->
+          <div class="form-row">
+
+            <div class="form-group">
+              <label for="validFrom">Valido dal</label>
+              <input id="validFrom" type="date" formControlName="validFrom" />
+            </div>
+
+            <div class="form-group">
+              <label for="validUntil">Valido fino al</label>
+              <input id="validUntil" type="date" formControlName="validUntil" />
+            </div>
+
+          </div>
+
+          <small class="text-muted hint">
+            Date e limiti vuoti significano nessuna restrizione. Lo sconto si applica al totale dei prodotti, spedizione esclusa.
+          </small>
+
+          <!-- ATTIVO -->
+          <div class="checkbox-row">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="active" />
+              Codice attivo
+            </label>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-cancel" (click)="closeModal()">
+              Annulla
+            </button>
+
+            <button type="submit" class="btn-save" [disabled]="couponForm.invalid || isSaving()">
+              {{ isSaving() ? 'Salvataggio...' : 'Salva Codice' }}
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  }
+
+</div>

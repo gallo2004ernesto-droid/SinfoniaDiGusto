@@ -284,3 +284,83 @@
   margin-top: 16px;
   font-size: 0.88rem;
 }
+
+
+/* Codice sconto */
+.coupon-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.coupon-box label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #3e2723;
+}
+
+.coupon-row {
+  display: flex;
+  gap: 8px;
+}
+
+.coupon-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border: 1px solid #dcd0c7;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  outline: none;
+}
+
+.coupon-row input:focus {
+  border-color: #e91e63;
+}
+
+.coupon-apply {
+  padding: 0 18px;
+  border: none;
+  border-radius: 8px;
+  background-color: #3e2723;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.coupon-apply:hover:not(:disabled) {
+  background-color: #e91e63;
+}
+
+.coupon-apply:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.coupon-applied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.coupon-remove {
+  background: none;
+  border: none;
+  color: #2e7d32;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.discount-row {
+  color: #2e7d32;
+  font-weight: 600;
+}

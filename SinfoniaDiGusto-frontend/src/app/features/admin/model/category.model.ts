@@ -1,12 +1,9 @@
 export interface Category {
     id?: number;
     name: string;
-    imageUrl?: string;
-    productCount?: number;
+    imgeUrl?: string;
 }
 
-// export interface Category {
-//   id?: number;
-//   name: string;
-//   imageUrl?: string | null;
-// }
+export interface AdminCategory extends Category {
+  productCount: number;
+}

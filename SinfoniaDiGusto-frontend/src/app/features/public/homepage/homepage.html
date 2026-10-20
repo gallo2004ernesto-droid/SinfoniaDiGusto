@@ -1,16 +1,12 @@
-<app-header
-  (toggleCartEvent)="openCart()">
+<app-header (toggleCartEvent)="openCart()">
 </app-header>
 
 <main class="home-container">
-  
-    <app-hero-banner 
-      [title]="'La dolcezza diventa arte'" 
-  [subtitle]="'Pasticceria Artigianale'"
-  [description]="'Creazioni artigianali preparate ogni giorno con gli ingredienti più pregiati, consegnate direttamente a casa tua.'"
-  [buttonText]="'Scopri le Nostre Creazioni'"
-  [buttonLink]="'/prodotti/torte'"
-  [bgImageUrl]="'hero.png'"></app-hero-banner>
+
+  <app-hero-banner [title]="'La dolcezza diventa arte'" [subtitle]="'Pasticceria Artigianale'"
+    [description]="'Creazioni artigianali preparate ogni giorno con gli ingredienti più pregiati, consegnate direttamente a casa tua.'"
+    [buttonText]="'Scopri le Nostre Creazioni'" [buttonLink]="'/prodotti'"
+    [bgImageUrl]="'hero.png'"></app-hero-banner>
   <!-- VALORI DI FORZA (BENEFITS) -->
   <section class="features-bar">
     <div class="feature-item">
@@ -39,44 +35,44 @@
   <app-category-slider (categorySelected)="onCategorySelect($event)"></app-category-slider>
 
   <!-- PRODOTTI IN EVIDENZA -->
-   <section class="featured-section">
-        <!-- Stato di Caricamento / Errore / Lista -->
-        @if (productState.isLoading()) {
-          <div class="loading-state">
-            <i class="fa-solid fa-circle-notch fa-spin"></i>
-            <p>Caricamento specialità in corso...</p>
-          </div>
-        } @else if (productState.error()) {
-          <div class="error-state">
-            <p>{{ productState.error() }}</p>
-          </div>
-        } @else {
-          <div class="products-grid">
-            @for (product of productState.featuredProducts(); track product.id) {
-              <app-product-card [product]="product"></app-product-card>
-            }
-          </div>
-        }
-        <div class="section-footer" style="text-align: center; margin-top: 30px;">
-               <a routerLink="/prodotti" class="btn-outline">
-                 Vedi Tutti i Prodotti <i class="fa-solid fa-arrow-right"></i>
-              </a>
-            </div>
+  <section class="featured-section">
+    <!-- Stato di Caricamento / Errore / Lista -->
+    @if (productState.isLoading()) {
+    <div class="loading-state">
+      <i class="fa-solid fa-circle-notch fa-spin"></i>
+      <p>Caricamento specialità in corso...</p>
+    </div>
+    } @else if (productState.error()) {
+    <div class="error-state">
+      <p>{{ productState.error() }}</p>
+    </div>
+    } @else {
+    <div class="products-grid">
+      @for (product of productState.featuredProducts()| slice:0:6; track product.id) {
+      <app-product-card [product]="product"></app-product-card>
+      }
+    </div>
+    }
+    <div class="section-footer" style="text-align: center; margin-top: 30px;">
+      <a routerLink="/prodotti" class="btn-outline">
+        Vedi Tutti i Prodotti <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
 
-        
-      </section>
+
+  </section>
 
 
   <!-- BANNER PROMOZIONALE OFFERTE -->
   @if (saleProducts().length > 0) {
-    <section class="promo-banner">
-      <div class="promo-content">
-        <span class="promo-badge"><i class="fa-solid fa-fire"></i> Offerte della Settimana</span>
-        <h2>Risparmia sulle delizie di stagione!</h2>
-        <p>Scopri i prodotti in sconto per un tempo limitato. Approfittane subito prima che finiscano!</p>
-        <a routerLink="/prodotti/offerte" class="btn-primary">Vai alle Offerte</a>
-      </div>
-    </section>
+  <section class="promo-banner">
+    <div class="promo-content">
+      <span class="promo-badge"><i class="fa-solid fa-fire"></i> Offerte della Settimana</span>
+      <h2>Risparmia sulle delizie di stagione!</h2>
+      <p>Scopri i prodotti in sconto per un tempo limitato. Approfittane subito prima che finiscano!</p>
+      <a routerLink="/prodotti/offerte" class="btn-primary">Vai alle Offerte</a>
+    </div>
+  </section>
   }
 
 </main>
@@ -84,7 +80,5 @@
 <!-- FOOTER -->
 <app-footer></app-footer>
 
-<app-cart
-  [isOpen]="cartOpen"
-  (closeCart)="closeCart()">
+<app-cart [isOpen]="cartOpen" (closeCart)="closeCart()">
 </app-cart>
