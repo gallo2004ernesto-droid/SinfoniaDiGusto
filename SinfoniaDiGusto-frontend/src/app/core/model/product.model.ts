@@ -1,18 +1,3 @@
-// export interface Product {
-//   id: number;
-//   name: string;
-//   description: string;
-//   price: number;
-//   originalPrice?: number; // Prezzo prima dello sconto
-//   onSale?: boolean;        // Flag per identificare le promozioni
-//   discountPercent?: number;
-//   category: string;
-//   imageUrl: string;
-//   bgColor?: string;
-//   featured?: boolean;
-//   pdfUrl?: string;
-// }
-
 import { Badge } from './badge.model';
 
 export interface Product {

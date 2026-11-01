@@ -23,6 +23,7 @@ import { SearchResultsComponent } from './features/public/ricerca/ricerca';
 import { SpedizioniComponent } from './features/public/spedizioni/spedizioniComponent';
 import { MetodiPagamentoComponent } from './features/public/metodi-pagamento/metodi-pagamentoComponent';
 import { ChiSiamoComponent } from './features/public/chi-siamo/chi-siamo';
+import { ForbiddenComponent } from './features/public/forbidden/forbidden';
 
 export const routes: Routes = [
     // homepage
@@ -61,6 +62,8 @@ export const routes: Routes = [
     {path: 'admin/badge', component: BadgeAdminComponent, canActivate: [AuthAdminGuard], data: {role: 'ADMIN'}},
     {path: 'admin/coupon', component: CouponAdminComponent, canActivate: [AuthAdminGuard], data: {role: 'ADMIN'}},
     {path: 'admin/il-mio-profilo', component: AdminProfileComponent, canActivate: [AuthAdminGuard], data: { role: 'ADMIN' }},
+
+    {path: 'forbidden', component: ForbiddenComponent},
 
     // fallback
     {path: '**', component: HomeComponent}

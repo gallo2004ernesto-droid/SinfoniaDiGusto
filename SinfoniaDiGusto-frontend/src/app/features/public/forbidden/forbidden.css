@@ -1,0 +1,127 @@
+.forbidden-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  padding: 40px 20px 80px;
+}
+
+.forbidden-card {
+  width: 100%;
+  max-width: 520px;
+  padding: 44px 32px;
+  background: #ffffff;
+  border: 1px solid #f0e6df;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.forbidden-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 84px;
+  height: 84px;
+  margin: 0 auto 18px;
+  background: #fdf2f5;
+  border-radius: 50%;
+  color: var(--accent-pink, #e91e63);
+  font-size: 2.2rem;
+}
+
+.forbidden-code {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--accent-pink, #e91e63);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.forbidden-card h1 {
+  margin: 0 0 12px;
+  color: var(--primary-brown, #3e2723);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.7rem, 5vw, 2.2rem);
+}
+
+.forbidden-card p {
+  margin: 0 0 26px;
+  color: var(--text-muted, #6d4c41);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.forbidden-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.btn-primary,
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: 25px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.btn-primary {
+  background: var(--primary-brown, #3e2723);
+  border: 2px solid var(--primary-brown, #3e2723);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: var(--accent-pink, #e91e63);
+  border-color: var(--accent-pink, #e91e63);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--primary-brown, #3e2723);
+  color: var(--primary-brown, #3e2723);
+}
+
+.btn-outline:hover {
+  border-color: var(--accent-pink, #e91e63);
+  color: var(--accent-pink, #e91e63);
+}
+
+.btn-back {
+  background: none;
+  border: none;
+  color: var(--text-muted, #6d4c41);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.btn-back:hover {
+  color: var(--accent-pink, #e91e63);
+}
+
+@media (max-width: 480px) {
+  .forbidden-card {
+    padding: 32px 20px;
+  }
+
+  .forbidden-actions {
+    flex-direction: column;
+  }
+
+  .btn-primary,
+  .btn-outline {
+    width: 100%;
+  }
+}

@@ -1,0 +1,44 @@
+<app-header (toggleCartEvent)="openCart()"></app-header>
+
+<main class="forbidden-container">
+  <div class="forbidden-card">
+
+    <div class="forbidden-icon">
+      <i class="fa-solid fa-lock"></i>
+    </div>
+
+    <span class="forbidden-code">Errore 403</span>
+    <h1>Accesso negato</h1>
+
+    @if (isLoggedIn()) {
+      <p>Non hai i permessi per accedere a questa pagina. Quest'area è riservata agli amministratori.</p>
+    } @else {
+      <p>Per accedere a questa pagina devi effettuare l'accesso con un account autorizzato.</p>
+    }
+
+    <div class="forbidden-actions">
+      <a routerLink="/" class="btn-primary">
+        <i class="fa-solid fa-house"></i> Torna alla home
+      </a>
+
+      @if (isLoggedIn()) {
+        <a routerLink="/i-miei-ordini" class="btn-outline">
+          <i class="fa-solid fa-box-open"></i> I miei ordini
+        </a>
+      } @else {
+        <a [routerLink]="['/auth', 'login']" class="btn-outline">
+          <i class="fa-regular fa-user"></i> Accedi
+        </a>
+      }
+    </div>
+
+    <button type="button" class="btn-back" (click)="goBack()">
+      <i class="fa-solid fa-arrow-left"></i> Torna alla pagina precedente
+    </button>
+
+  </div>
+</main>
+
+<app-footer></app-footer>
+
+<app-cart [isOpen]="cartOpen" (closeCart)="closeCart()"></app-cart>
